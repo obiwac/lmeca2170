@@ -84,7 +84,7 @@
 				vec3 diffuse_colour = vec3(1.0, 0.0, 0.0) * shading;
 				vec3 spec_colour = vec3(spec);
 
-				frag_colour = vec4(diffuse_colour + spec_colour, u_alpha);
+				frag_colour = vec4(1.0, 0.0, 1.0, 1.0); // vec4(diffuse_colour + spec_colour, u_alpha);
 			}
 		</script>
 	</head>

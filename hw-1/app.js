@@ -131,6 +131,60 @@ class Matrix {
 
 var identity = new Matrix()
 
+class Lines {
+	constructor(gl) {
+		this.vertices = []
+		this.indices = []
+
+		this.gl = gl
+		this.add_line(-1, -1, 1, 1)
+	}
+
+	add_line(x1, y1, x2, y2) {
+		const index = this.vertices.length / 3
+
+		this.vertices.push(x1)
+		this.vertices.push(y1)
+		this.vertices.push(0)
+
+		this.vertices.push(x2)
+		this.vertices.push(y2)
+		this.vertices.push(0)
+
+		this.indices.push(index)
+		this.indices.push(index + 1)
+
+		this.gl.deleteBuffer(this.vbo)
+		this.gl.deleteBuffer(this.ibo)
+
+		this.vbo = this.gl.createBuffer()
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo)
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.vertices), this.gl.STATIC_DRAW)
+
+		this.ibo = this.gl.createBuffer()
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices), this.gl.STATIC_DRAW)
+	}
+
+	draw(gl, render_state, model_matrix) {
+		if (this.vertices.length === 0) {
+			return
+		}
+
+		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
+
+		let float_size = this.vertices.BYTES_PER_ELEMENT
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+
+		gl.enableVertexAttribArray(render_state.pos_attr)
+		gl.vertexAttribPointer(render_state.pos_attr, 3, gl.FLOAT, gl.FALSE, float_size * 3, float_size * 0)
+
+		gl.drawElements(gl.LINES, this.indices.length, gl.UNSIGNED_INT, 0)
+	}
+}
+
 class Model {
 	// this class handles the buffer creation and rendering of models
 
@@ -211,9 +265,9 @@ function abs_min(x, y) {
 	return y;
 }
 
-class Balloon {
+class Geonum {
 	// actual rendering code
-	// Balloon does all the WebGL setup and handles the main loop/cows
+	// Geonum does all the WebGL setup and handles the main loop/cows
 
 	constructor() {
 		// WebGL setup
@@ -313,9 +367,9 @@ class Balloon {
 			alpha_uniform:         this.gl.getUniformLocation(this.program, "u_alpha"),
 		}
 
-		// load models
+		// MARKER
 
-		this.balloon = new Model(this.gl, balloon_model)
+		this.lines = new Lines(this.gl)
 
 		// loop
 
@@ -387,16 +441,16 @@ class Balloon {
 		this.gl.uniform1f(this.render_state.ripple_time_uniform, ripple_time)
 		this.gl.uniform1f(this.render_state.alpha_uniform, alpha)
 
-		this.balloon.draw(this.gl, this.render_state, model_matrix)
+		this.lines.draw(this.gl, this.render_state, model_matrix)
 
 		requestAnimationFrame((now) => this.render(now))
 	}
 }
 
-// create a new instance of Balloon when the page loads
+// create a new instance of Geonum when the page loads
 
-var balloon
+var geonum
 
 window.addEventListener("load", () => {
-	balloon = new Balloon()
+	geonum = new Geonum()
 }, false)
