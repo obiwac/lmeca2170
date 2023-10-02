@@ -137,7 +137,7 @@ class Lines {
 		this.indices = []
 
 		this.gl = gl
-		this.add_line(-1, -1, 1, 1)
+		this.add_line(0, 0, 1, 1)
 	}
 
 	add_line(x1, y1, x2, y2) {
@@ -246,6 +246,7 @@ class Model {
 }
 
 const TAU = Math.PI * 2
+const z_offset = 5;
 
 var mx = 0
 var my = 0
@@ -281,26 +282,37 @@ class Geonum {
 			return
 		}
 
+		let px = 0
+		let py = 0
+		let has_prev = false
+
+		// MARKER
+
+		this.lines = new Lines(this.gl)
+
 		window.addEventListener("mousemove", event => {
 			const rect = canvas.getBoundingClientRect()
 
 			const cx = rect.left + canvas.clientWidth  / 2
 			const cy = rect.top + canvas.clientHeight / 2
 
-			target_mx = (event.clientX - cx) / canvas.clientWidth;
-			target_my = (event.clientY - cy) / canvas.clientHeight;
+			target_mx = (event.clientX - cx) / canvas.clientWidth
+			target_my = (event.clientY - cy) / canvas.clientHeight
 		}, false)
 
 		window.addEventListener("click", () => {
 			// XXX a bunch of these magic values can be found in the vertex shader
 			//     they're hardcoded out of laziness
-
-			if (ripple_time * 6 - 3 < TAU) {
-				return
+			if (has_prev) {
+				has_prev = false;
+				this.lines.add_line(px*z_offset, py*z_offset, target_mx*z_offset, -target_my*z_offset)
 			}
 
-			ripple_origin = [target_mx, -target_my]
-			ripple_time = 0
+			else {
+				has_prev = true
+				px = target_mx
+				py = -target_m
+			}
 		}, false)
 
 		window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", event => {
@@ -367,10 +379,6 @@ class Geonum {
 			alpha_uniform:         this.gl.getUniformLocation(this.program, "u_alpha"),
 		}
 
-		// MARKER
-
-		this.lines = new Lines(this.gl)
-
 		// loop
 
 		this.target_fov = TAU / 4
@@ -418,8 +426,8 @@ class Geonum {
 
 		const view_matrix = new Matrix()
 
-		view_matrix.translate(0, -1.1, -5)
-		view_matrix.rotate_2d(0, -0.3)
+		view_matrix.translate(0, 0, -z_offset)
+		//view_matrix.rotate_2d(0, -0.3)
 
 		const vp_matrix = new Matrix(view_matrix)
 		vp_matrix.multiply(proj_matrix)
