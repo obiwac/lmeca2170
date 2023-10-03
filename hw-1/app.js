@@ -311,7 +311,7 @@ class Geonum {
 			else {
 				has_prev = true
 				px = target_mx
-				py = -target_m
+				py = -target_my
 			}
 		}, false)
 
