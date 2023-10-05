@@ -131,7 +131,7 @@ class Matrix {
 
 var identity = new Matrix()
 
-var line_color = [1.0, 0.0, 1.0]
+var line_color = [0.0, 0.0, 1.0]
 var intersection_color = [1.0, 0.0, 0.0]
 var default_color = [0.0, 0.0, 0.0]
 
@@ -139,27 +139,27 @@ var segments = []
 
 function abs_min(x, y) {
 	if (Math.abs(x) < Math.abs(y)) {
-		return x;
+		return x
 	}
 
-	return y;
+	return y
 }
 
 function max(a, b){
-	return (a >= b) ? a : b;
+	return (a >= b) ? a : b
 }
 
 function min(a, b){
-	return (a <= b) ? a : b;
+	return (a <= b) ? a : b
 }
 
 //check if third point is on the first - second, segment.
 function on_segment(x1, y1, x2, y2, x3, y3) {
 	if(x3 <= max(x1, x2) && x3 >= min(x1, x2) && y3 <= max(y1, y2) && y3 >= min(y1, y2)) {
-		return true;
+		return true
 	}
 
-	return false;
+	return false
 }
 
 function segment_intersection(xa1, ya1, xa2, ya2, xb1, yb1, xb2, yb2) {
@@ -174,8 +174,8 @@ function segment_intersection(xa1, ya1, xa2, ya2, xb1, yb1, xb2, yb2) {
 		return // same
 	}
 
-	const intersection_x = (offset_b - offset_a) / (slope_a - slope_b);
-	const intersection_y = (slope_a * intersection_x) + offset_a;
+	const intersection_x = (offset_b - offset_a) / (slope_a - slope_b)
+	const intersection_y = (slope_a * intersection_x) + offset_a
 
 	return [intersection_x, intersection_y]
 }
@@ -236,15 +236,13 @@ class Lines {
 	}
 
 	add_line(x1, y1, x2, y2, pt) {
-
 		for(let i = 0; i < segments.length; i++) {
-			let a, b;
-			[a, b] = segment_intersection(segments[i][0], segments[i][1], segments[i][2], segments[i][3], x1, y1, x2, y2);
-			if(on_segment(x1, y1, x2, y2, a, b) && on_segment(segments[i][0], segments[i][1], segments[i][2], segments[i][3], a, b)) {
+			let [a, b] = segment_intersection(segments[i][0], segments[i][1], segments[i][2], segments[i][3], x1, y1, x2, y2)
+
+			if (on_segment(x1, y1, x2, y2, a, b) && on_segment(segments[i][0], segments[i][1], segments[i][2], segments[i][3], a, b)) {
 				pt.add_point(a, b)
 			}
 		}
-
 
 		const index = this.vertices.length / 3
 
@@ -271,18 +269,17 @@ class Lines {
 		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices), this.gl.STATIC_DRAW)
 
 		segments.push([x1, y1, x2, y2])
-
 	}
 
 	draw(gl, render_state, model_matrix) {
 		if (this.vertices.length === 0) {
 			return
 		}
-		gl.uniform3f(render_state.color_uniform, ...line_color)
 
+		gl.uniform3f(render_state.color_uniform, ...line_color)
 		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
 
-		let float_size = this.vertices.BYTES_PER_ELEMENT
+		const float_size = this.vertices.BYTES_PER_ELEMENT
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
@@ -355,7 +352,7 @@ class Model {
 }
 
 const TAU = Math.PI * 2
-const z_offset = 5;
+const z_offset = 5
 
 var mx = 0
 var my = 0
@@ -366,7 +363,21 @@ var target_my = 0
 var ripple_origin = [0, 0]
 var ripple_time = 0
 var alpha = 1
+var part = 1
 
+function toggle_parts() {
+	const button = document.getElementById("switch")
+
+	if (part === 1) {
+		part = 2
+		button.innerHTML = "Switch to part 1"
+	}
+
+	else if (part === 2) {
+		part = 1
+		button.innerHTML = "Switch to part 2"
+	}
+}
 
 class Geonum {
 	// actual rendering code
@@ -377,7 +388,7 @@ class Geonum {
 		// this is all quite boilerplate-y stuff
 
 		const canvas = document.getElementById("canvas")
-		this.gl = canvas.getContext("webgl2") || canvas.getContext("experimental-webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+		this.gl = canvas.getContext("webgl2") || canvas.getContext("experimental-webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
 
 		if (!this.gl || (!(this.gl instanceof WebGLRenderingContext) && !(this.gl instanceof WebGL2RenderingContext))) {
 			canvas.hidden = true
@@ -406,9 +417,10 @@ class Geonum {
 		window.addEventListener("click", () => {
 			// XXX a bunch of these magic values can be found in the vertex shader
 			//     they're hardcoded out of laziness
+
 			if (has_prev) {
-				has_prev = false;
-				this.lines.add_line(px*z_offset, py*z_offset, target_mx*z_offset, -target_my*z_offset, this.points)
+				has_prev = false
+				this.lines.add_line(px * z_offset, py * z_offset, target_mx * z_offset, -target_my * z_offset, this.points)
 			}
 
 			else {
@@ -427,6 +439,7 @@ class Geonum {
 
 		this.gl.viewport(0, 0, this.x_res, this.y_res)
 
+		this.gl.lineWidth(3)
 		this.gl.disable(this.gl.DEPTH_TEST)
 		this.gl.enable(this.gl.CULL_FACE)
 
@@ -480,8 +493,7 @@ class Geonum {
 			ripple_time_uniform:   this.gl.getUniformLocation(this.program, "u_ripple_time"),
 
 			alpha_uniform:         this.gl.getUniformLocation(this.program, "u_alpha"),
-
-			color_uniform:		   this.gl.getUniformLocation(this.program, "u_color"),
+			color_uniform:         this.gl.getUniformLocation(this.program, "u_color"),
 		}
 
 		// loop
@@ -532,7 +544,7 @@ class Geonum {
 		const view_matrix = new Matrix()
 
 		view_matrix.translate(0, 0, -z_offset)
-		//view_matrix.rotate_2d(0, -0.3)
+		view_matrix.rotate_2d(time, 0)
 
 		const vp_matrix = new Matrix(view_matrix)
 		vp_matrix.multiply(proj_matrix)

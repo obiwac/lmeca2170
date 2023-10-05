@@ -61,7 +61,7 @@
 
 				world_pos = u_model * vec4(pos, 1.0);
 				gl_Position = u_vp * world_pos;
-				gl_PointSize = 20.0f;
+				gl_PointSize = 10.0;
 			}
 		</script>
 
@@ -85,12 +85,14 @@
 				vec3 diffuse_colour = vec3(1.0, 0.0, 0.0) * shading;
 				vec3 spec_colour = vec3(spec);
 
-				frag_colour = vec4(u_color, 1.0);//vec4(1.0, 0.0, 1.0, 1.0); // vec4(diffuse_colour + spec_colour, u_alpha);
+				frag_colour = vec4(u_color, 1.0);
 			}
 		</script>
 	</head>
 
 	<body>
+		<button id="switch" onclick="toggle_parts()">Switch to part 2</button>
+		<br>
 		<canvas id="canvas" width="900" height="900", style="border:3px solid #020000; position:relative; top:5; left:5;"></canvas>
 	</body>
 </html>
