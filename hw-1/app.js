@@ -137,6 +137,9 @@ var default_color = [0.0, 0.0, 0.0]
 
 var segments = []
 
+const z_offset = 5
+
+
 function abs_min(x, y) {
 	if (Math.abs(x) < Math.abs(y)) {
 		return x
@@ -294,41 +297,64 @@ class Model {
 	constructor(gl, model) {
 		this.model = model
 
-		// POUR TOI ALEXIS
+		this.vertices = []
+		this.indices = []
+
+		const data_nodes = model["Nodes"][0]
+
+		for (let i = 0; i < data_nodes["Coordinates"].length; i++) {
+			let [x, y, z] = data_nodes["Coordinates"][i]
+
+			this.vertices.push(x)
+			this.vertices.push(y)
+			this.vertices.push(z)
+		}
+
+		const data_elements = model["Elements"]
+
+		for (let i = 0; i < data_elements.length; i++){
+			if (data_elements[i]["Type"] == 2){
+				const node_connnectivity = data_elements[i]["NodalConnectivity"]
+
+				for (let j = 0; j < node_connnectivity.length; j++) {
+					let [a, b, c] = (node_connnectivity[j])
+					this.indices.push(a)
+					this.indices.push(b)
+					this.indices.push(c)
+				}
+
+				break
+			}
+		}
 
 		this.vbo = gl.createBuffer()
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bufferData(gl.ARRAY_BUFFER, this.model.vertices, gl.STATIC_DRAW)
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices), gl.STATIC_DRAW)
 
 		this.ibo = gl.createBuffer()
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.model.indices, gl.STATIC_DRAW)
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW)
 	}
 
 	draw(gl, render_state, model_matrix) {
+		gl.uniform3f(render_state.color_uniform, 0, 0, 0)
 		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
 
-		const float_size = this.model.vertices.BYTES_PER_ELEMENT
+		const float_size = this.vertices.BYTES_PER_ELEMENT
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
 
 		gl.enableVertexAttribArray(render_state.pos_attr)
-		gl.enableVertexAttribArray(render_state.normal_attr)
 
-		gl.vertexAttribPointer(render_state.pos_attr,    3, gl.FLOAT, gl.FALSE, float_size * 6, float_size * 0)
-		gl.vertexAttribPointer(render_state.normal_attr, 3, gl.FLOAT, gl.FALSE, float_size * 6, float_size * 3)
+		gl.vertexAttribPointer(render_state.pos_attr, 3, gl.FLOAT, gl.FALSE, float_size * 3, float_size * 0)
 
-		gl.cullFace(gl.FRONT)
-		gl.drawElements(gl.TRIANGLES, this.model.indices.length, gl.UNSIGNED_SHORT, 0)
-
-		gl.cullFace(gl.BACK)
-		gl.drawElements(gl.TRIANGLES, this.model.indices.length, gl.UNSIGNED_SHORT, 0)
+		gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
+		//gl.drawElements(gl.GL_POINTS, this.indices.length, gl.UNSIGNED_INT, 0)
 	}
 }
 
 const TAU = Math.PI * 2
-const z_offset = 5
 
 var mx = 0
 var my = 0
@@ -381,7 +407,7 @@ class Geonum {
 		this.lines = new Lines(this.gl)
 		this.mesh = new Model(this.gl, mesh)
 
-		window.addEventListener("mousemove", event => {
+		canvas.addEventListener("mousemove", event => {
 			const rect = canvas.getBoundingClientRect()
 
 			const cx = rect.left + canvas.clientWidth  / 2
@@ -391,7 +417,7 @@ class Geonum {
 			target_my = (event.clientY - cy) / canvas.clientHeight
 		}, false)
 
-		window.addEventListener("click", () => {
+		canvas.addEventListener("click", () => {
 			// XXX a bunch of these magic values can be found in the vertex shader
 			//     they're hardcoded out of laziness
 
