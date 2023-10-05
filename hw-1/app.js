@@ -137,8 +137,7 @@ var default_color = [0.0, 0.0, 0.0]
 
 var segments = []
 
-const z_offset = 5
-
+const Z_OFFSET = 5
 
 function abs_min(x, y) {
 	if (Math.abs(x) < Math.abs(y)) {
@@ -156,7 +155,8 @@ function min(a, b){
 	return (a <= b) ? a : b
 }
 
-//check if third point is on the first - second, segment.
+// check if third point is on the first - second, segment.
+
 function on_segment(x1, y1, x2, y2, x3, y3) {
 	if(x3 <= max(x1, x2) && x3 >= min(x1, x2) && y3 <= max(y1, y2) && y3 >= min(y1, y2)) {
 		return true
@@ -473,7 +473,6 @@ class Geonum {
 		})
 
 		window.addEventListener("wheel", event => {
-			event.preventDefault()
 			target_zoom += event.deltaY / 500
 		})
 
