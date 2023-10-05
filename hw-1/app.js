@@ -131,7 +131,7 @@ class Matrix {
 
 var identity = new Matrix()
 
-var line_color = [0.0, 0.0, 1.0]
+var line_color = [0.0, 1.0, 0.0]
 var intersection_color = [1.0, 0.0, 0.0]
 var default_color = [0.0, 0.0, 0.0]
 
@@ -215,7 +215,6 @@ class Point {
 		}
 
 		gl.uniform3f(render_state.color_uniform, ...intersection_color)
-
 		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
 
 		const float_size = this.vertices.BYTES_PER_ELEMENT
