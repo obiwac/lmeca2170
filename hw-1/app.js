@@ -215,7 +215,7 @@ class Point {
 
 		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
 
-		let float_size = this.vertices.BYTES_PER_ELEMENT
+		const float_size = this.vertices.BYTES_PER_ELEMENT
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
@@ -232,7 +232,6 @@ class Lines {
 		this.indices = []
 
 		this.gl = gl
-		//this.add_line(0, 0, 1, 1)
 	}
 
 	add_line(x1, y1, x2, y2, pt) {
@@ -292,21 +291,14 @@ class Lines {
 }
 
 class Model {
-	// this class handles the buffer creation and rendering of models
-
 	constructor(gl, model) {
-		// gl:    instance of WebGLRenderingContext
-		// model: the model we wanna load (these are simple JS objects)
-
 		this.model = model
 
-		// create vertex buffer
+		// POUR TOI ALEXIS
 
 		this.vbo = gl.createBuffer()
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
 		gl.bufferData(gl.ARRAY_BUFFER, this.model.vertices, gl.STATIC_DRAW)
-
-		// create index buffer
 
 		this.ibo = gl.createBuffer()
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
@@ -314,21 +306,9 @@ class Model {
 	}
 
 	draw(gl, render_state, model_matrix) {
-		// gl:           instance of WebGLRenderingContext
-		// render_state: the render_state object
-		// model_matrix: the model matrix to use to transform the model
-
-		// pass the model matrix of our model (so that's like its own translation/rotation/scale) to the model uniform
-
 		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
 
-		// set buffers up for drawing
-		// the attribute layout here is as follows (in total, we use 8 32-bit floats per attribute so 32 bytes total):
-		// 0: 3 32-bit floats at offset 0 for the vertex positions
-		// 1: 2 32-bit floats at offset 12 for the texture coordinates
-		// 2: 3 32-bit floats at offset 20 for the normal vectors
-
-		let float_size = this.model.vertices.BYTES_PER_ELEMENT
+		const float_size = this.model.vertices.BYTES_PER_ELEMENT
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
@@ -338,10 +318,6 @@ class Model {
 
 		gl.vertexAttribPointer(render_state.pos_attr,    3, gl.FLOAT, gl.FALSE, float_size * 6, float_size * 0)
 		gl.vertexAttribPointer(render_state.normal_attr, 3, gl.FLOAT, gl.FALSE, float_size * 6, float_size * 3)
-
-		// finally, actually draw the model
-		// we draw the back face followed by the front face, so we blend the fragments of both together
-		// this is actually why we don't need depth testing, as our balloon is convex and, aside from front/back which we're anyway controlling, there are no overlapping fragments
 
 		gl.cullFace(gl.FRONT)
 		gl.drawElements(gl.TRIANGLES, this.model.indices.length, gl.UNSIGNED_SHORT, 0)
@@ -403,6 +379,7 @@ class Geonum {
 
 		this.points = new Point(this.gl)
 		this.lines = new Lines(this.gl)
+		this.mesh = new Model(this.gl, mesh)
 
 		window.addEventListener("mousemove", event => {
 			const rect = canvas.getBoundingClientRect()
@@ -544,7 +521,7 @@ class Geonum {
 		const view_matrix = new Matrix()
 
 		view_matrix.translate(0, 0, -z_offset)
-		view_matrix.rotate_2d(time, 0)
+		// view_matrix.rotate_2d(time, 0)
 
 		const vp_matrix = new Matrix(view_matrix)
 		vp_matrix.multiply(proj_matrix)
@@ -567,8 +544,14 @@ class Geonum {
 		this.gl.uniform1f(this.render_state.alpha_uniform, alpha)
 		this.gl.uniform3f(this.render_state.color_uniform, ...default_color)
 
-		this.lines.draw(this.gl, this.render_state, model_matrix)
-		this.points.draw(this.gl, this.render_state, model_matrix)
+		if (part === 1) {
+			this.lines.draw(this.gl, this.render_state, model_matrix)
+			this.points.draw(this.gl, this.render_state, model_matrix)
+		}
+
+		else {
+			this.mesh.draw(this.gl, this.render_state, model_matrix)
+		}
 
 		requestAnimationFrame((now) => this.render(now))
 	}
