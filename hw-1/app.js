@@ -137,7 +137,7 @@ var default_color = [0.0, 0.0, 0.0]
 
 var segments = []
 
-const z_offset = 5
+const Z_OFFSET = 5
 
 
 function abs_min(x, y) {
