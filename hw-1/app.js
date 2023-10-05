@@ -238,7 +238,7 @@ class Lines {
 	}
 
 	add_line(x1, y1, x2, y2, pt) {
-		for(let i = 0; i < segments.length; i++) {
+		for(let i = 0; pt && i < segments.length; i++) {
 			let [a, b] = segment_intersection(segments[i][0], segments[i][1], segments[i][2], segments[i][3], x1, y1, x2, y2)
 
 			if (on_segment(x1, y1, x2, y2, a, b) && on_segment(segments[i][0], segments[i][1], segments[i][2], segments[i][3], a, b)) {
@@ -295,7 +295,7 @@ class Lines {
 
 class Model {
 	constructor(gl, model) {
-		this.model = model
+		this.lines = new Lines(gl)
 
 		this.vertices = []
 		this.indices = []
@@ -318,13 +318,17 @@ class Model {
 
 		for (let i = 0; i < data_elements.length; i++){
 			if (data_elements[i]["Type"] == 2){
-				const node_connnectivity = data_elements[i]["NodalConnectivity"]
+				const node_connectivity = data_elements[i]["NodalConnectivity"]
 
 				for (let j = 0; j < node_connnectivity.length; j++) {
-					let [a, b, c] = node_connnectivity[j]
+					let [a, b, c] = (node_connnectivity[j])
 					this.indices.push(a)
 					this.indices.push(b)
 					this.indices.push(c)
+
+					this.lines.add_line(this.vertices[a * 3 + 0], this.vertices[a * 3 + 1], this.vertices[b * 3 + 0], this.vertices[b * 3 + 1], undefined)
+					this.lines.add_line(this.vertices[b * 3 + 0], this.vertices[b * 3 + 1], this.vertices[c * 3 + 0], this.vertices[c * 3 + 1], undefined)
+					this.lines.add_line(this.vertices[c * 3 + 0], this.vertices[c * 3 + 1], this.vertices[a * 3 + 0], this.vertices[a * 3 + 1], undefined)
 				}
 
 				break
@@ -350,12 +354,12 @@ class Model {
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
 
 		gl.enableVertexAttribArray(render_state.pos_attr)
-
 		gl.vertexAttribPointer(render_state.pos_attr, 3, gl.FLOAT, gl.FALSE, float_size * 3, float_size * 0)
 
 		gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
 		//gl.drawElements(gl.GL_POINTS, this.indices.length, gl.UNSIGNED_INT, 0)
 
+		this.lines.draw(gl, render_state, model_matrix)
 		this.points.draw(gl, render_state, model_matrix)
 	}
 }
