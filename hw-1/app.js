@@ -299,6 +299,8 @@ class Model {
 		this.vertices = []
 		this.indices = []
 
+		this.points = new Point(gl)
+
 		const data_nodes = model["Nodes"][0]
 
 		for (let i = 0; i < data_nodes["Coordinates"].length; i++) {
@@ -307,6 +309,8 @@ class Model {
 			this.vertices.push(x)
 			this.vertices.push(y)
 			this.vertices.push(z)
+
+			this.points.add_point(x, y)
 		}
 
 		const data_elements = model["Elements"]
@@ -315,9 +319,8 @@ class Model {
 			if (data_elements[i]["Type"] == 2){
 				const node_connectivity = data_elements[i]["NodalConnectivity"]
 
-				for (let j = 0; j < node_connectivity.length; j++) {
-					let [a, b, c] = node_connectivity[j]
-
+				for (let j = 0; j < node_connnectivity.length; j++) {
+					let [a, b, c] = (node_connnectivity[j])
 					this.indices.push(a)
 					this.indices.push(b)
 					this.indices.push(c)
@@ -353,8 +356,10 @@ class Model {
 		gl.vertexAttribPointer(render_state.pos_attr, 3, gl.FLOAT, gl.FALSE, float_size * 3, float_size * 0)
 
 		gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
+		//gl.drawElements(gl.GL_POINTS, this.indices.length, gl.UNSIGNED_INT, 0)
 
 		this.lines.draw(gl, render_state, model_matrix)
+		this.points.draw(gl, render_state, model_matrix)
 	}
 }
 
