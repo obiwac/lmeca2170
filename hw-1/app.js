@@ -5,7 +5,7 @@ class Matrix {
 	// I won't comment on the code here all that much because it's pretty much just computations
 
 	constructor(template) {
-		// if we pass a template matrix, copy it
+		// if we pass a template matrix, coprev_y it
 		// otherwise, initialize it to the 4x4 identity matrix
 
 		if (template) {
@@ -328,7 +328,7 @@ class Model {
 }
 
 const TAU = Math.PI * 2
-const z_offset = 5
+const Z_OFFSET = 5
 
 var mx = 0
 var my = 0
@@ -341,6 +341,17 @@ var ripple_time = 0
 var alpha = 1
 var part = 1
 
+var target_zoom = 1
+var zoom = 1
+
+var target_px = 0
+var px = 0
+
+var target_py = 0
+var py = 0
+
+var translating = false
+
 function toggle_parts() {
 	const button = document.getElementById("switch")
 
@@ -352,6 +363,16 @@ function toggle_parts() {
 	else if (part === 2) {
 		part = 1
 		button.innerHTML = "Switch to part 2"
+	}
+}
+
+function anim(x, target, multiplier) {
+	if (multiplier > 1) {
+		return target
+	}
+
+	else {
+		return x + (target - x) * multiplier
 	}
 }
 
@@ -371,8 +392,8 @@ class Geonum {
 			return
 		}
 
-		let px = 0
-		let py = 0
+		let prev_x = 0
+		let prev_y = 0
 		let has_prev = false
 
 		// MARKER
@@ -380,6 +401,10 @@ class Geonum {
 		this.points = new Point(this.gl)
 		this.lines = new Lines(this.gl)
 		this.mesh = new Model(this.gl, mesh)
+
+		zoom = 1
+		px = 0
+		py = 0
 
 		window.addEventListener("mousemove", event => {
 			const rect = canvas.getBoundingClientRect()
@@ -389,23 +414,42 @@ class Geonum {
 
 			target_mx = (event.clientX - cx) / canvas.clientWidth
 			target_my = (event.clientY - cy) / canvas.clientHeight
+
+			if (translating) {
+				target_px += event.movementX / 150 * zoom
+				target_py -= event.movementY / 150 * zoom
+			}
 		}, false)
 
-		window.addEventListener("click", () => {
-			// XXX a bunch of these magic values can be found in the vertex shader
-			//     they're hardcoded out of laziness
+		window.addEventListener("click", event => {
+			const shift = event.getModifierState("Shift")
 
-			if (has_prev) {
+			if (has_prev && !shift) {
 				has_prev = false
-				this.lines.add_line(px * z_offset, py * z_offset, target_mx * z_offset, -target_my * z_offset, this.points)
+				this.lines.add_line(prev_x * Z_OFFSET * zoom - target_px, prev_y * Z_OFFSET * zoom - target_py, target_mx * Z_OFFSET * zoom - target_px, -target_my * Z_OFFSET * zoom - target_py, this.points)
 			}
 
 			else {
-				has_prev = true
-				px = target_mx
-				py = -target_my
+				has_prev = !shift
+				prev_x = target_mx
+				prev_y = -target_my
 			}
 		}, false)
+
+		window.addEventListener("mousedown", event => {
+			if (event.getModifierState("Shift")) {
+				translating = true
+			}
+		})
+
+		window.addEventListener("mouseup", () => {
+			translating = false
+		})
+
+		window.addEventListener("wheel", event => {
+			event.preventDefault()
+			target_zoom += event.deltaY / 500
+		})
 
 		window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", event => {
 			alpha = event.matches ? 0.8 : 1
@@ -520,7 +564,7 @@ class Geonum {
 
 		const view_matrix = new Matrix()
 
-		view_matrix.translate(0, 0, -z_offset)
+		view_matrix.translate(0, 0, -Z_OFFSET)
 		// view_matrix.rotate_2d(time, 0)
 
 		const vp_matrix = new Matrix(view_matrix)
@@ -528,7 +572,16 @@ class Geonum {
 
 		// model matrix
 
+		target_zoom = Math.max(target_zoom, 0.3)
+		zoom = anim(zoom, Math.pow(target_zoom, 2), dt * 20)
+
+		px = anim(px, target_px, dt * 15)
+		py = anim(py, target_py, dt * 15)
+
 		const model_matrix = new Matrix(identity)
+
+		model_matrix.scale(1 / zoom, 1 / zoom, 1)
+		model_matrix.translate(px, py, 0)
 
 		// actually render
 
