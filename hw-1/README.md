@@ -4,6 +4,8 @@
 
 Open the `index.html` in your browser.
 
+> :warning: **If rounded nodes are blinking**: Please disable hardware acceleration.
+
 ## Controls
 
 |Control|Description|
