@@ -1,19 +1,28 @@
-# Line intersection and triangle detection.
+# Line intersection and triangle detection
 
 ## How to use
-open the index.html in your browser.
 
-## Commands
-| `scroll` | used to zoom in & out. |
-|---|----|
-| `shift + left click` | used to move around the scene. |
-| `left click ` | used to interact with the scene. |
+Open the `index.html` in your browser.
+
+## Controls
+
+|Control|Description|
+|-|-|
+|Scroll wheel|Zooms the camera in and out.|
+|Left click|Interact with the scene (add line in part 1, select triangle in part 2).|
+|Shift + left click and drag|Move the camera around the scene.|
+|Click button|Toggle between parts 1 and 2.
 
 ## How it works
-The wole project use WebGL2.
 
-### Line intersection
-For each line created, we check every other lines and check for their intersections. Eeach intersections apears in red.
+The project uses WebGL 2.
 
-### Triangle detection
-When a point is placed on the plane, we check every triangle et check if the point is inside the triangle by Barycentric Coordinates. When the point is located inside a triangle, this one turn purple.
+### Line intersection (part 1)
+
+For each line created, we check every other lines and check for their intersections.
+Intersection points are shown in red.
+
+### Triangle detection (part 2)
+
+When the plane is clicked, we check for every triangle if the point where the user clicked is inside the triangle with barycentric coordinates.
+When the point is located inside a triangle, it turns pink.

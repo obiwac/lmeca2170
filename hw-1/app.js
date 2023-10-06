@@ -1,4 +1,4 @@
-// most of this is based off of MOOdle: https://obiw.ac/moodle
+// most of the boilerplate here is based off of MOOdle: https://obiw.ac/moodle
 
 class Matrix {
 	// matrices are all 4x4, and are initialized as the identity matrix
