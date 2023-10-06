@@ -319,8 +319,8 @@ class Model {
 			if (data_elements[i]["Type"] == 2){
 				const node_connectivity = data_elements[i]["NodalConnectivity"]
 
-				for (let j = 0; j < node_connnectivity.length; j++) {
-					let [a, b, c] = (node_connnectivity[j])
+				for (let j = 0; j < node_connectivity.length; j++) {
+					let [a, b, c] = (node_connectivity[j])
 					this.indices.push(a)
 					this.indices.push(b)
 					this.indices.push(c)
