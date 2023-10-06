@@ -17,6 +17,9 @@
 
 			uniform vec3 u_ripple_origin;
 			uniform float u_ripple_time;
+			uniform vec3 u_indices;
+			uniform vec3 u_color;
+
 
 			out vec3 pos;
 			out vec3 normal;
@@ -24,6 +27,8 @@
 			out vec4 world_pos;
 			out float shading;
 			out float spec;
+
+			out vec4 vertex_color;
 
 			#define TAU 6.28318
 
@@ -59,6 +64,13 @@
 				// output position
 
 				world_pos = u_model * vec4(pos, 1.0);
+				if ((u_indices.x == float(gl_VertexID) || u_indices.y == float(gl_VertexID) || u_indices.z == float(gl_VertexID))
+				&& u_color != vec3(0.0, 1.0, 0.0)) {
+					vertex_color = vec4(1.0, 0.0, 1.0, 1.0);
+				} else {
+					vertex_color = vec4(u_color, 1.0);
+				}
+
 				gl_Position = u_vp * world_pos;
 				gl_PointSize = 10.0;
 			}
@@ -69,7 +81,6 @@
 			precision lowp int;
 
 			uniform float u_alpha;
-			uniform vec3 u_color;
 
 			in vec3 pos;
 			in vec3 normal;
@@ -78,13 +89,17 @@
 			in float shading;
 			in float spec;
 
+			in vec4 vertex_color;
+
 			out vec4 frag_colour;
 
 			void main(void) {
 				vec3 diffuse_colour = vec3(1.0, 0.0, 0.0) * shading;
 				vec3 spec_colour = vec3(spec);
 
-				frag_colour = vec4(u_color, 1.0);
+				vec4 clamped_color = vertex_color;
+
+				frag_colour = clamped_color;
 			}
 		</script>
 	</head>
