@@ -172,7 +172,8 @@ function segment_intersection(xa1, ya1, xa2, ya2, xb1, yb1, xb2, yb2) {
 	const offset_b = yb1 - (slope_b * xb1)
 
 	if(slope_a == slope_b) {
-		return // same
+		alert("Degenerate case")
+		return
 	}
 
 	const intersection_x = (offset_b - offset_a) / (slope_a - slope_b)
