@@ -212,6 +212,7 @@ class Point {
 			return
 		}
 
+		gl.uniform1i(render_state.is_point_uniform, 1)
 		gl.uniform3f(render_state.color_uniform, ...intersection_color)
 		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
 
@@ -223,6 +224,8 @@ class Point {
 		gl.enableVertexAttribArray(render_state.pos_attr)
 		gl.vertexAttribPointer(render_state.pos_attr, 3, gl.FLOAT, gl.FALSE, float_size*3, float_size * 0)
 		gl.drawElements(gl.GL_POINTS, this.indices.length, gl.UNSIGNED_INT, 0)
+
+		gl.uniform1i(render_state.is_point_uniform, 0)
 	}
 }
 
@@ -554,6 +557,7 @@ class Geonum {
 
 		this.gl.viewport(0, 0, this.x_res, this.y_res)
 
+		this.gl.enable(this.gl.POINT_SMOOTH)
 		this.gl.lineWidth(3)
 		this.gl.disable(this.gl.DEPTH_TEST)
 		this.gl.enable(this.gl.CULL_FACE)
@@ -606,7 +610,6 @@ class Geonum {
 
 			model_uniform:         this.gl.getUniformLocation(this.program, "u_model"),
 			vp_uniform:            this.gl.getUniformLocation(this.program, "u_vp"),
-			sunlight_uniform:      this.gl.getUniformLocation(this.program, "u_sunlight"),
 
 			ripple_origin_uniform: this.gl.getUniformLocation(this.program, "u_ripple_origin"),
 			ripple_time_uniform:   this.gl.getUniformLocation(this.program, "u_ripple_time"),
@@ -614,6 +617,7 @@ class Geonum {
 			alpha_uniform:         this.gl.getUniformLocation(this.program, "u_alpha"),
 			color_uniform:         this.gl.getUniformLocation(this.program, "u_color"),
 			vertex_indices_uniform:this.gl.getUniformLocation(this.program, "u_indices"),
+			is_point_uniform:      this.gl.getUniformLocation(this.program, "u_is_point"),
 		}
 
 		// loop
