@@ -135,8 +135,6 @@ var line_color = [0.0, 1.0, 0.0]
 var intersection_color = [1.0, 0.0, 0.0]
 var default_color = [0.0, 0.0, 0.0]
 
-var segments = []
-
 const Z_OFFSET = 5
 
 function abs_min(x, y) {
@@ -232,15 +230,16 @@ class Lines {
 	constructor(gl) {
 		this.vertices = []
 		this.indices = []
+		this.segments = []
 
 		this.gl = gl
 	}
 
 	add_line(x1, y1, x2, y2, pt) {
-		for(let i = 0; pt && i < segments.length; i++) {
-			let [a, b] = segment_intersection(segments[i][0], segments[i][1], segments[i][2], segments[i][3], x1, y1, x2, y2)
+		for(let i = 0; pt && i < this.segments.length; i++) {
+			let [a, b] = segment_intersection(this.segments[i][0], this.segments[i][1], this.segments[i][2], this.segments[i][3], x1, y1, x2, y2)
 
-			if (on_segment(x1, y1, x2, y2, a, b) && on_segment(segments[i][0], segments[i][1], segments[i][2], segments[i][3], a, b)) {
+			if (on_segment(x1, y1, x2, y2, a, b) && on_segment(this.segments[i][0], this.segments[i][1], this.segments[i][2], this.segments[i][3], a, b)) {
 				pt.add_point(a, b)
 			}
 		}
@@ -269,7 +268,7 @@ class Lines {
 		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo)
 		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices), this.gl.STATIC_DRAW)
 
-		segments.push([x1, y1, x2, y2])
+		this.segments.push([x1, y1, x2, y2])
 	}
 
 	draw(gl, render_state, model_matrix) {
