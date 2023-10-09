@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<title>Homework 2</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="./style.css" type="text/css">
+        <script type="text/javascript" src="mesh_small.json"></script>
+		<script type="text/javascript" src="app.js"></script>
+        <script src="https://unpkg.com/robust-predicates@3.0.1/umd/predicates.min.js"></script>
+	</head>
+
+	<body>
+        <canvas id="canvas1" width="900" height="900", style="border:3px solid #020000;position:relative; top: 5; left: 5;"></canvas>
+		<canvas id="canvas2" width="900" height="900", style="border:3px solid #020000;position:relative; top: 15; left: 5;"></canvas>
+		<script>
+            const canvas1 = document.getElementById("canvas1");
+			const canvas2 = document.getElementById("canvas2");
+			mesh = create_mesh(mesh_data);
+            setup_triangle_location(mesh, canvas1);
+			setup_segment_location(mesh, canvas2);
+        </script>
+	</body>
+
+</html>
