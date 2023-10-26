@@ -137,164 +137,6 @@ var default_color = [0.0, 0.0, 0.0]
 
 const Z_OFFSET = 5
 
-function abs_min(x, y) {
-	if (Math.abs(x) < Math.abs(y)) {
-		return x
-	}
-
-	return y
-}
-
-function max(a, b){
-	return (a >= b) ? a : b
-}
-
-function min(a, b){
-	return (a <= b) ? a : b
-}
-
-// check if third point is on the first - second, segment.
-
-function on_segment(x1, y1, x2, y2, x3, y3) {
-	if(x3 <= max(x1, x2) && x3 >= min(x1, x2) && y3 <= max(y1, y2) && y3 >= min(y1, y2)) {
-		return true
-	}
-
-	return false
-}
-
-function segment_intersection(xa1, ya1, xa2, ya2, xb1, yb1, xb2, yb2) {
-
-	const slope_a = (ya2 - ya1) / (xa2 - xa1)
-	const slope_b = (yb2 - yb1) / (xb2 - xb1)
-
-	const offset_a = ya1 - (slope_a * xa1)
-	const offset_b = yb1 - (slope_b * xb1)
-
-	if(slope_a == slope_b) {
-		alert("Degenerate case")
-		return
-	}
-
-	const intersection_x = (offset_b - offset_a) / (slope_a - slope_b)
-	const intersection_y = (slope_a * intersection_x) + offset_a
-
-	return [intersection_x, intersection_y]
-}
-
-class Point {
-	constructor(gl) {
-		this.vertices = []
-		this.indices = []
-		this.gl = gl
-	}
-
-	add_point(x, y) {
-		this.vertices.push(x)
-		this.vertices.push(y)
-		this.vertices.push(0)
-
-		this.indices.push(this.indices.length)
-
-		this.gl.deleteBuffer(this.vbo)
-		this.gl.deleteBuffer(this.ibo)
-
-		this.vbo = this.gl.createBuffer()
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo)
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.vertices), this.gl.STATIC_DRAW)
-
-		this.ibo = this.gl.createBuffer()
-		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices), this.gl.STATIC_DRAW)
-	}
-
-	draw(gl, render_state, model_matrix) {
-		if (this.vertices.length === 0) {
-			return
-		}
-
-		gl.uniform1i(render_state.is_point_uniform, 1)
-		gl.uniform3f(render_state.color_uniform, ...intersection_color)
-		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
-
-		const float_size = this.vertices.BYTES_PER_ELEMENT
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-
-		gl.enableVertexAttribArray(render_state.pos_attr)
-		gl.vertexAttribPointer(render_state.pos_attr, 3, gl.FLOAT, gl.FALSE, float_size*3, float_size * 0)
-		gl.drawElements(gl.GL_POINTS, this.indices.length, gl.UNSIGNED_INT, 0)
-
-		gl.uniform1i(render_state.is_point_uniform, 0)
-	}
-}
-
-class Lines {
-	constructor(gl) {
-		this.vertices = []
-		this.indices = []
-		this.segments = []
-
-		this.gl = gl
-	}
-
-	add_line(x1, y1, x2, y2, pt) {
-		for(let i = 0; pt && i < this.segments.length; i++) {
-			let [a, b] = segment_intersection(this.segments[i][0], this.segments[i][1], this.segments[i][2], this.segments[i][3], x1, y1, x2, y2)
-
-			if (on_segment(x1, y1, x2, y2, a, b) && on_segment(this.segments[i][0], this.segments[i][1], this.segments[i][2], this.segments[i][3], a, b)) {
-				pt.add_point(a, b)
-			}
-		}
-
-		const index = this.vertices.length / 3
-
-		this.vertices.push(x1)
-		this.vertices.push(y1)
-		this.vertices.push(0)
-
-		this.vertices.push(x2)
-		this.vertices.push(y2)
-		this.vertices.push(0)
-
-		this.indices.push(index)
-		this.indices.push(index + 1)
-
-		this.gl.deleteBuffer(this.vbo)
-		this.gl.deleteBuffer(this.ibo)
-
-		this.vbo = this.gl.createBuffer()
-		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo)
-		this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(this.vertices), this.gl.STATIC_DRAW)
-
-		this.ibo = this.gl.createBuffer()
-		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices), this.gl.STATIC_DRAW)
-
-		this.segments.push([x1, y1, x2, y2])
-	}
-
-	draw(gl, render_state, model_matrix) {
-		if (this.vertices.length === 0) {
-			return
-		}
-
-		gl.uniform3f(render_state.color_uniform, ...line_color)
-		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
-
-		const float_size = this.vertices.BYTES_PER_ELEMENT
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-
-		gl.enableVertexAttribArray(render_state.pos_attr)
-		gl.vertexAttribPointer(render_state.pos_attr, 3, gl.FLOAT, gl.FALSE, float_size * 3, float_size * 0)
-
-		gl.drawElements(gl.LINES, this.indices.length, gl.UNSIGNED_INT, 0)
-	}
-}
-
 class Mesh {
 	constructor(mesh_data) {
 		mesh = {
@@ -318,7 +160,7 @@ class Mesh {
 		let node_pair_to_hedge = {}
 		let half_edges = []
 
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < elem_data.Indices.length; i++) {
 			const face = {
 				id: elem_data.Indices[i],
 				incident_edge: -1,
@@ -369,131 +211,6 @@ class Mesh {
 	}
 }
 
-class Model {
-	constructor(gl, model) {
-		this.lines = new Lines(gl)
-
-		this.temp_vertices = []
-		this.temp_indices = []
-
-		// Litlte hack to unattach the mesh (have separates triangles)
-		this.vertices = []
-		this.indices = []
-
-		this.triangles = []
-
-		this.highlight_triangle = [-1, -1, -1]
-
-		this.points = new Point(gl)
-
-		const data_nodes = model["Nodes"][0]
-
-		for (let i = 0; i < data_nodes["Coordinates"].length; i++) {
-			let [x, y, z] = data_nodes["Coordinates"][i]
-
-			this.temp_vertices.push(x)
-			this.temp_vertices.push(y)
-			this.temp_vertices.push(z)
-		}
-
-		const data_elements = model["Elements"]
-
-		for (let i = 0; i < data_elements.length; i++){
-			if (data_elements[i]["Type"] == 2){
-				const node_connectivity = data_elements[i]["NodalConnectivity"]
-
-				for (let j = 0; j < node_connectivity.length; j++) {
-					let [a, b, c] = (node_connectivity[j])
-					this.temp_indices.push(a)
-					this.temp_indices.push(b)
-					this.temp_indices.push(c)
-				}
-
-				break
-			}
-		}
-
-		let current_idx = 0;
-		//this is where whe unattach the mesh
-		for (let i = 0; i < this.temp_indices.length; i+=3){
-			let a = this.temp_indices[i]
-			let b = this.temp_indices[i+1]
-			let c = this.temp_indices[i+2]
-
-			let v1 = [this.temp_vertices[a * 3 + 0], this.temp_vertices[a * 3 + 1], this.temp_vertices[a * 3 + 2]]
-			let v2 = [this.temp_vertices[b * 3 + 0], this.temp_vertices[b * 3 + 1], this.temp_vertices[b * 3 + 2]]
-			let v3 = [this.temp_vertices[c * 3 + 0], this.temp_vertices[c * 3 + 1], this.temp_vertices[c * 3 + 2]]
-
-			this.points.add_point(v1[0], v1[1])
-			this.points.add_point(v2[0], v2[1])
-			this.points.add_point(v3[0], v3[1])
-
-			this.vertices.push(...v1)
-			this.vertices.push(...v2)
-			this.vertices.push(...v3)
-
-			this.indices.push(current_idx++)
-			this.indices.push(current_idx++)
-			this.indices.push(current_idx++)
-
-		}
-
-		for (let i = 0; i < this.indices.length; i+=3){
-			this.triangles.push([
-				[this.vertices[i * 3], this.vertices[(i * 3) + 1], this.vertices[(i * 3) + 2], i],
-				[this.vertices[(i + 1 ) * 3], this.vertices[(i + 1) * 3 + 1], this.vertices[(i + 1 ) * 3 + 2], (i+1)],
-				[this.vertices[(i + 2 ) * 3], this.vertices[((i + 2 ) * 3 + 1)], this.vertices[((i + 2 ) * 3 + 2)], (i+2)],
-			])
-
-			this.lines.add_line(this.vertices[i * 3], this.vertices[(i * 3) + 1], this.vertices[(i + 1 ) * 3], this.vertices[(i + 1) * 3 + 1], undefined)
-			this.lines.add_line(this.vertices[(i + 1 ) * 3], this.vertices[(i + 1) * 3 + 1], this.vertices[((i + 2 ) * 3)], this.vertices[((i + 2 ) * 3 + 1)], undefined)
-			this.lines.add_line(this.vertices[((i + 2 ) * 3)], this.vertices[((i + 2 ) * 3 + 1)], this.vertices[i * 3], this.vertices[(i * 3) + 1], undefined)
-		}
-
-		this.vbo = gl.createBuffer()
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices), gl.STATIC_DRAW)
-
-		this.ibo = gl.createBuffer()
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW)
-	}
-
-	get_triangle_from_point(x, y) {
-		for (let i = 0; i < this.triangles.length; i++) {
-			let area =  ((this.triangles[i][1][1] - this.triangles[i][2][1]) * (this.triangles[i][0][0] - this.triangles[i][2][0]) + (this.triangles[i][2][0] - this.triangles[i][1][0]) * (this.triangles[i][0][1] - this.triangles[i][2][1]))
-			let bary_a = ((this.triangles[i][1][1] - this.triangles[i][2][1]) * (x - this.triangles[i][2][0]) + (this.triangles[i][2][0] - this.triangles[i][1][0]) * (y - this.triangles[i][2][1])) / area
-			let bary_b = ((this.triangles[i][2][1] - this.triangles[i][0][1]) * (x - this.triangles[i][2][0]) + (this.triangles[i][0][0] - this.triangles[i][2][0]) * (y - this.triangles[i][2][1])) / area
-			let bary_c = 1 - bary_a - bary_b;
-
-			if (bary_a >= 0 && bary_b >= 0 && bary_c >= 0) {
-				return [this.triangles[i][0][3], this.triangles[i][1][3], this.triangles[i][2][3]]
-			}
-		}
-
-		return -1
-	}
-
-	draw(gl, render_state, model_matrix) {
-		gl.uniform3f(render_state.color_uniform, 0, 0, 0)
-		gl.uniform3f(render_state.vertex_indices_uniform, ...this.highlight_triangle)
-
-		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
-
-		const float_size = this.vertices.BYTES_PER_ELEMENT
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-
-		gl.enableVertexAttribArray(render_state.pos_attr)
-		gl.vertexAttribPointer(render_state.pos_attr, 3, gl.FLOAT, gl.FALSE, float_size * 3, float_size * 0)
-
-		gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0)
-
-		this.lines.draw(gl, render_state, model_matrix)
-		this.points.draw(gl, render_state, model_matrix)
-	}
-}
 
 const TAU = Math.PI * 2
 
@@ -565,10 +282,7 @@ class Geonum {
 
 		// MARKER
 
-		this.points = new Point(this.gl)
-		this.lines = new Lines(this.gl)
-		this.mesh = new Model(this.gl, mesh)
-		this.truc = new Mesh(mesh)
+		this.mesh = new Mesh(mesh)
 
 		zoom = 1
 		px = 0
@@ -777,14 +491,9 @@ class Geonum {
 		this.gl.uniform3f(this.render_state.color_uniform, ...default_color)
 		this.gl.uniform3f(this.render_state.vertex_indices_uniform, -1, -1, -1)
 
-		if (part === 1) {
-			this.lines.draw(this.gl, this.render_state, model_matrix)
-			this.points.draw(this.gl, this.render_state, model_matrix)
-		}
-
-		else {
-			this.mesh.draw(this.gl, this.render_state, model_matrix)
-		}
+		
+		//this.mesh.draw(this.gl, this.render_state, model_matrix)
+		
 
 		requestAnimationFrame((now) => this.render(now))
 	}

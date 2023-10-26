@@ -3,8 +3,6 @@
 	<head>
 		<title>LMECA2170: Homework #2</title>
 		<meta charset="utf-8">
-		<script type="text/javascript" src="app.js"></script>
-		<script type="text/javascript" src="mesh_small.json"></script>
 		<script id="vert-shader" type="x-shader/x-vertex">#version 300 es
 			precision mediump float;
 
@@ -74,11 +72,16 @@
 				frag_colour = vertex_color;
 			}
 		</script>
+<head>
+		<title>Homework 2</title>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="./style.css" type="text/css">
+		<script type="text/javascript" src="mesh_small.json"></script>
+		<script type="text/javascript" src="app.js"></script>
+		<script src="https://unpkg.com/robust-predicates@3.0.1/umd/predicates.min.js"></script>
 	</head>
-
 	<body>
-		<button id="switch" onclick="toggle_parts()">Switch to part 2</button>
-		<br>
+	
 		<canvas id="canvas" width="900" height="900", style="border:3px solid #020000; position:relative; top:5; left:5;"></canvas>
 	</body>
 </html>
