@@ -11,7 +11,37 @@ function setup_segment_location(mesh, canvas) {
 }
 
 function create_mesh(mesh_data) {
-	// TODO
+	mesh = {
+		nodes: [],
+		edges: [],
+		faces: [],
+	}
+
+	const node_data = mesh_data.Nodes[0]
+	const elem_data = mesh_data.Elements[1]
+
+	for (let i = 0; i < node_data.Indices.length; i++) {
+		const node = {
+			id: node_data.Indices[i],
+			pos: node_data.Coordinates[i],
+		}
+
+		mesh.nodes.push(node)
+	}
+
+	let node_pair_to_edge = {}
+
+	for (let i = 0; i < elem_data.Indices.length; i++) {
+		const face = {
+			id: elem_data.Indices[i],
+			incident_edge: null,
+		}
+
+		const face_nodes = elem_data.NodalConnectivity[i]
+
+		// TODO create the 3 half-edges in this triangle
+		// determine the connectivity of the half-edges
+	}
 }
 
 function draw_mesh(mesh, canvas) {
