@@ -135,6 +135,8 @@ var line_color = [0.0, 1.0, 0.0]
 var intersection_color = [1.0, 0.0, 0.0]
 var default_color = [0.0, 0.0, 0.0]
 
+var highlight_triangle = [-1, -1, -1]
+
 const Z_OFFSET = 5
 
 
@@ -222,19 +224,23 @@ function on_segment(x1, y1, x2, y2, x3, y3) {
 	return false
 }
 
-function wait(ms){
-	var start = new Date().getTime();
-	var end = start;
-	while(end < start + ms) {
-	  end = new Date().getTime();
-   }
- }
+function orient2d(pa, pb, pc) {
+  let acx, bcx, acy, bcy;
+
+  acx = pa[0] - pc[0];
+  bcx = pb[0] - pc[0];
+  acy = pa[1] - pc[1];
+  bcy = pb[1] - pc[1];
+
+  return acx * bcy - acy * bcx;
+}
 
 class Mesh {
 	constructor(mesh_data, gl) {
 
 		this.points = new Point(gl)
 		this.lines = new Lines(gl)
+		this.nodes_to_vertex_id = {}
 
 		this.mesh = {
 			nodes: [],
@@ -250,7 +256,7 @@ class Mesh {
 				id: node_data.Indices[i],
 				pos: node_data.Coordinates[i],
 			}
-
+			this.nodes_to_vertex_id[node_data.Indices[i]] = i;
 			this.mesh.nodes.push(node)
 		}
 
@@ -354,21 +360,20 @@ class Mesh {
 				temp_highlight.push([node_start_x, node_start_y])
 				temp_highlight.push([node_end_x, node_end_y])
 
-				let [a, b] = segment_intersection(start_point_x, start_point_y, pt[0], pt[1], node_start_x, node_start_y, node_end_x, node_end_y)
+				this.lines.add_line(node_start_x, node_start_y, node_end_x, node_end_y)
 
-				if (on_segment(node_start_x, node_start_y, node_end_x, node_end_y, a, b)) {
+				let [a, b] = segment_intersection(start_point_x, start_point_y, pt[0], pt[1], node_start_x, node_start_y, node_end_x, node_end_y)
+				let on_seg_tri = on_segment(node_start_x, node_start_y, node_end_x, node_end_y, a, b)
+				let on_seg_droite = on_segment(start_point_x, start_point_y, pt[0], pt[1], a, b)
+
+				if (on_seg_droite && on_seg_tri) {
 					this.points.add_point(a, b)
 					intersection_cnt += 1
 				}
 				current_edge = current_edge.next
 			} while (current_edge != current.incident_edge)
 
-			if (intersection_cnt >= 2) { // segment is in the triangle
-				//TODO HIGHLIGHT, for the moment its shit ...
-				for(let i = 0; i < temp_highlight.length; i++) {
-					this.points.add_point(...temp_highlight[i])
-				}
-
+			if (intersection_cnt >= 1) { // segment is in the triangle
 				// ADD neighboor
 				let current_edge = current.incident_edge
 
@@ -377,8 +382,10 @@ class Mesh {
 					if (oppo_edge != -1) {
 						q.push(oppo_edge.incidentFace)
 					}
+					//highlight_triangle.push(current_edge.orig.id)
+					//this.lines.add_line(current_edge.orig.pos[0], current_edge.orig.pos[1], 10, 10)
 					current_edge = current_edge.next
-				} while (current_edge !=  current.incident_edge)
+				} while (current_edge != current.incident_edge)
 			}
 		}
 	}
@@ -408,8 +415,6 @@ class Model {
 		this.indices = []
 
 		this.triangles = []
-
-		this.highlight_triangle = [-1, -1, -1]
 
 		this.points = new Point(gl)
 
@@ -503,7 +508,7 @@ class Model {
 
 	draw(gl, render_state, model_matrix) {
 		gl.uniform3f(render_state.color_uniform, 0, 0, 0)
-		gl.uniform3f(render_state.vertex_indices_uniform, ...this.highlight_triangle)
+		gl.uniform3f(render_state.vertex_indices_uniform, ...highlight_triangle)
 
 		gl.uniformMatrix4fv(render_state.model_uniform, false, model_matrix.data.flat())
 
