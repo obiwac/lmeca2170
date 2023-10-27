@@ -53,7 +53,14 @@
 			out vec4 frag_colour;
 
 			void main(void) {
-				frag_colour = vertex_color;
+				if(vertex_color != vec4(1.0, 0.0, 0.0, 1.0)
+				&& vertex_color != vec4(0.0, 1.0, 0.0, 1.0)
+				&& vertex_color != vec4(1.0, 1.0, 0.0, 1.0)
+				&& vertex_color != vec4(1.0, 0.0, 1.0, 1.0)) {
+					frag_colour = vec4(0.0, 0.0, 0.0, 1.0);
+				} else {
+					frag_colour = vertex_color;
+				}
 			}
 		</script>
 <head>

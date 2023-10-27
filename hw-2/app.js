@@ -136,6 +136,7 @@ var intersection_color = [1.0, 0.0, 0.0]
 var default_color = [0.0, 0.0, 0.0]
 
 var highlight_triangle = [-1, -1, -1]
+var coordinates_to_idx = {}
 
 const Z_OFFSET = 5
 
@@ -322,14 +323,22 @@ class Mesh {
 
 			this.mesh.faces.push(face)
 		}
-		console.log(this.mesh)
 	}
 
-	marching_triangle(pt) { //WE ASSUME THAT THE POINT IS RIGHT (COORDINATES)
+	marching_triangle(pt, orig, find_triangle) { //WE ASSUME THAT THE POINT IS RIGHT (COORDINATES)
 		let starting_face = 20
 		let q = [this.mesh.faces[starting_face]]
-		let start_point_x = this.mesh.faces[starting_face].incident_edge.orig.pos[0]
-		let start_point_y = this.mesh.faces[starting_face].incident_edge.orig.pos[1]
+
+		let start_point_x ;
+		let start_point_y;
+
+		if(orig) {
+			start_point_x = orig[0]
+			start_point_y = orig[1]
+		} else {
+			start_point_x = this.mesh.faces[starting_face].incident_edge.orig.pos[0]
+			start_point_y = this.mesh.faces[starting_face].incident_edge.orig.pos[1]
+		}
 		this.lines.add_line(start_point_x, start_point_y, pt[0], pt[1])
 
 		let visited = new Map()
@@ -360,8 +369,6 @@ class Mesh {
 				temp_highlight.push([node_start_x, node_start_y])
 				temp_highlight.push([node_end_x, node_end_y])
 
-				this.lines.add_line(node_start_x, node_start_y, node_end_x, node_end_y)
-
 				let [a, b] = segment_intersection(start_point_x, start_point_y, pt[0], pt[1], node_start_x, node_start_y, node_end_x, node_end_y)
 				let on_seg_tri = on_segment(node_start_x, node_start_y, node_end_x, node_end_y, a, b)
 				let on_seg_droite = on_segment(start_point_x, start_point_y, pt[0], pt[1], a, b)
@@ -375,6 +382,9 @@ class Mesh {
 
 			if (intersection_cnt >= 1) { // segment is in the triangle
 				// ADD neighboor
+				if (find_triangle){
+					highlight_triangle = []
+				}
 				let current_edge = current.incident_edge
 
 				do {
@@ -382,11 +392,16 @@ class Mesh {
 					if (oppo_edge != -1) {
 						q.push(oppo_edge.incidentFace)
 					}
-					//highlight_triangle.push(current_edge.orig.id)
-					//this.lines.add_line(current_edge.orig.pos[0], current_edge.orig.pos[1], 10, 10)
+
+					if (find_triangle === true) {
+						highlight_triangle.push(coordinates_to_idx[[current_edge.orig.pos[0], current_edge.orig.pos[1]].toString()])
+					}
 					current_edge = current_edge.next
 				} while (current_edge != current.incident_edge)
 			}
+		}
+		if (highlight_triangle.length < 3) {
+			highlight_triangle = [-1, -1, -1]
 		}
 	}
 
@@ -426,6 +441,8 @@ class Model {
 			this.temp_vertices.push(x)
 			this.temp_vertices.push(y)
 			this.temp_vertices.push(z)
+			coordinates_to_idx[[x, y]] = i
+			this.points.add_point(x, y)
 		}
 
 		const data_elements = model["Elements"]
@@ -439,13 +456,21 @@ class Model {
 					this.temp_indices.push(a)
 					this.temp_indices.push(b)
 					this.temp_indices.push(c)
+
+					this.lines.add_line(this.temp_vertices[a * 3 + 0], this.temp_vertices[a * 3 + 1], this.temp_vertices[b * 3 + 0], this.temp_vertices[b * 3 + 1], undefined)
+					this.lines.add_line(this.temp_vertices[b * 3 + 0], this.temp_vertices[b * 3 + 1], this.temp_vertices[c * 3 + 0], this.temp_vertices[c * 3 + 1], undefined)
+					this.lines.add_line(this.temp_vertices[c * 3 + 0], this.temp_vertices[c * 3 + 1], this.temp_vertices[a * 3 + 0], this.temp_vertices[a * 3 + 1], undefined)
+
 				}
 
 				break
 			}
 		}
 
-		let current_idx = 0;
+		this.vertices = this.temp_vertices
+		this.indices = this.temp_indices
+
+		/*let current_idx = 0;
 		//this is where whe unattach the mesh
 		for (let i = 0; i < this.temp_indices.length; i+=3){
 			let a = this.temp_indices[i]
@@ -480,7 +505,7 @@ class Model {
 			this.lines.add_line(this.vertices[i * 3], this.vertices[(i * 3) + 1], this.vertices[(i + 1 ) * 3], this.vertices[(i + 1) * 3 + 1], undefined)
 			this.lines.add_line(this.vertices[(i + 1 ) * 3], this.vertices[(i + 1) * 3 + 1], this.vertices[((i + 2 ) * 3)], this.vertices[((i + 2 ) * 3 + 1)], undefined)
 			this.lines.add_line(this.vertices[((i + 2 ) * 3)], this.vertices[((i + 2 ) * 3 + 1)], this.vertices[i * 3], this.vertices[(i * 3) + 1], undefined)
-		}
+		}*/
 
 		this.vbo = gl.createBuffer()
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
@@ -648,16 +673,12 @@ class Geonum {
 			return
 		}
 
-		let prev_x = 0
-		let prev_y = 0
-		let has_prev = false
-
 		// MARKER
 		this.model = new Model(this.gl, mesh)
 
 		this.mesh = new Mesh(mesh, this.gl)
 
-		this.mesh.marching_triangle([0.11404410041538215, 0.931412313029647])
+		this.mesh.marching_triangle([0.11404410041538215, 0.931412313029647], undefined, false)
 
 		zoom = 1
 		px = 0
