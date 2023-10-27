@@ -137,82 +137,6 @@ var default_color = [0.0, 0.0, 0.0]
 
 const Z_OFFSET = 5
 
-class Mesh {
-	constructor(mesh_data) {
-		mesh = {
-			nodes: [],
-			edges: [],
-			faces: [],
-		}
-
-		const node_data = mesh_data.Nodes[0]
-		const elem_data = mesh_data.Elements[1]
-
-		for (let i = 0; i < node_data.Indices.length; i++) {
-			const node = {
-				id: node_data.Indices[i],
-				pos: node_data.Coordinates[i],
-			}
-
-			mesh.nodes.push(node)
-		}
-
-		let node_pair_to_hedge = {}
-
-		for (let i = 0; i < elem_data.Indices.length; i++) {
-			const face = {
-				id: elem_data.Indices[i],
-				incident_edge: -1,
-			}
-
-			const face_nodes = elem_data.NodalConnectivity[i]
-			let current_idx = mesh.edges.length
-			mesh.faces.push(face_nodes)
-
-			mesh.edges.push({
-				incidentFace: face.id,
-				oppo: -1,
-				next: -1,
-				orig: face_nodes[0],
-				dest: face_nodes[1],
-			})
-
-			mesh.edges.push({
-				incidentFace: face.id,
-				oppo: -1,
-				next: -1,
-				orig: face_nodes[1],
-				dest: face_nodes[2],
-			})
-
-			mesh.edges.push({
-				incidentFace: face.id,
-				oppo: -1,
-				next: -1,
-				orig: face_nodes[2],
-				dest: face_nodes[0],
-			})
-
-			// determine the connectivity of the half-edges
-			for (let j = 0; j < 3; j++) {
-				mesh.edges[current_idx+j].next = (current_idx+j+1) % 3
-
-				const a = !Object.keys(node_pair_to_hedge).includes([face_nodes[j],face_nodes[(j+1)%3]].toString())
-				const b = !Object.keys(node_pair_to_hedge).includes([face_nodes[(j+1)%3], face_nodes[j]].toString())
-
-				if (a && b) {
-					node_pair_to_hedge[[face_nodes[j],face_nodes[(j+1)%3]]] = current_idx+j
-				} else {
-					mesh.edges[current_idx+j].oppo = node_pair_to_hedge[[face_nodes[(j+1)%3], face_nodes[j]]]
-					mesh.edges[node_pair_to_hedge[[face_nodes[(j+1)%3], face_nodes[j]]]].oppo = current_idx+j
-				}
-
-			}
-		}
-		console.log(mesh)
-	}
-}
-
 
 const TAU = Math.PI * 2
 
@@ -259,6 +183,216 @@ function anim(x, target, multiplier) {
 
 	else {
 		return x + (target - x) * multiplier
+	}
+}
+
+function segment_intersection(xa1, ya1, xa2, ya2, xb1, yb1, xb2, yb2) {
+
+	const slope_a = (ya2 - ya1) / (xa2 - xa1)
+	const slope_b = (yb2 - yb1) / (xb2 - xb1)
+
+	const offset_a = ya1 - (slope_a * xa1)
+	const offset_b = yb1 - (slope_b * xb1)
+
+	if(slope_a == slope_b) {
+		alert("Degenerate case")
+		return
+	}
+
+	const intersection_x = (offset_b - offset_a) / (slope_a - slope_b)
+	const intersection_y = (slope_a * intersection_x) + offset_a
+
+	return [intersection_x, intersection_y]
+}
+
+function max(a, b){
+	return (a >= b) ? a : b
+}
+
+function min(a, b){
+	return (a <= b) ? a : b
+}
+
+// check if third point is on the first - second, segment.
+function on_segment(x1, y1, x2, y2, x3, y3) {
+	if(x3 <= max(x1, x2) && x3 >= min(x1, x2) && y3 <= max(y1, y2) && y3 >= min(y1, y2)) {
+		return true
+	}
+
+	return false
+}
+
+function wait(ms){
+	var start = new Date().getTime();
+	var end = start;
+	while(end < start + ms) {
+	  end = new Date().getTime();
+   }
+ }
+
+class Mesh {
+	constructor(mesh_data, gl) {
+
+		this.points = new Point(gl)
+		this.lines = new Lines(gl)
+
+		this.mesh = {
+			nodes: [],
+			edges: [],
+			faces: [],
+		}
+
+		const node_data = mesh_data.Nodes[0]
+		const elem_data = mesh_data.Elements[1]
+
+		for (let i = 0; i < node_data.Indices.length; i++) {
+			const node = {
+				id: node_data.Indices[i],
+				pos: node_data.Coordinates[i],
+			}
+
+			this.mesh.nodes.push(node)
+		}
+
+		let node_pair_to_hedge = {}
+
+		for (let i = 0; i < elem_data.Indices.length; i++) {
+			const face = {
+				id: elem_data.Indices[i],
+				incident_edge: -1,
+			}
+
+			const face_nodes = elem_data.NodalConnectivity[i]
+			let current_idx = this.mesh.edges.length
+
+			this.mesh.edges.push({
+				incidentFace: -1,
+				oppo: -1,
+				next: -1,
+				orig: this.mesh.nodes[face_nodes[0]],
+				dest: this.mesh.nodes[face_nodes[1]],
+			})
+
+			this.mesh.edges.push({
+				incidentFace: -1,
+				oppo: -1,
+				next: -1,
+				orig: this.mesh.nodes[face_nodes[1]],
+				dest: this.mesh.nodes[face_nodes[2]],
+			})
+
+			this.mesh.edges.push({
+				incidentFace: -1,
+				oppo: -1,
+				next: -1,
+				orig: this.mesh.nodes[face_nodes[2]],
+				dest: this.mesh.nodes[face_nodes[0]],
+			})
+
+			// determine the connectivity of the half-edges
+			for (let j = 0; j < 3; j++) {
+				if (j == 2) {
+					this.mesh.edges[current_idx+j].next = this.mesh.edges[current_idx]
+				} else {
+					this.mesh.edges[current_idx+j].next = this.mesh.edges[(current_idx+j+1)]
+				}
+
+				const a = !Object.keys(node_pair_to_hedge).includes([face_nodes[j],face_nodes[(j+1)%3]].toString())
+				const b = !Object.keys(node_pair_to_hedge).includes([face_nodes[(j+1)%3], face_nodes[j]].toString())
+
+				if (a && b) {
+					node_pair_to_hedge[[face_nodes[j],face_nodes[(j+1)%3]]] = current_idx+j
+				} else {
+					this.mesh.edges[current_idx+j].oppo = this.mesh.edges[node_pair_to_hedge[[face_nodes[(j+1)%3], face_nodes[j]]]]
+					this.mesh.edges[node_pair_to_hedge[[face_nodes[(j+1)%3], face_nodes[j]]]].oppo = this.mesh.edges[current_idx+j]
+				}
+
+			}
+			face.incident_edge = this.mesh.edges[current_idx]
+
+			this.mesh.edges[current_idx].incidentFace = face
+			this.mesh.edges[current_idx + 1].incidentFace = face
+			this.mesh.edges[current_idx + 2].incidentFace = face
+
+			this.mesh.faces.push(face)
+		}
+		console.log(this.mesh)
+	}
+
+	marching_triangle(pt) { //WE ASSUME THAT THE POINT IS RIGHT (COORDINATES)
+		let starting_face = 20
+		let q = [this.mesh.faces[starting_face]]
+		let start_point_x = this.mesh.faces[starting_face].incident_edge.orig.pos[0]
+		let start_point_y = this.mesh.faces[starting_face].incident_edge.orig.pos[1]
+		this.lines.add_line(start_point_x, start_point_y, pt[0], pt[1])
+
+		let visited = new Map()
+
+		this.points.add_point(start_point_x, start_point_y)
+		this.points.add_point(pt[0], pt[1])
+
+		let crash = 0
+		while (q.length) {
+			let current = q.shift()
+			if (visited.get(current.id)) {
+				continue
+			}
+
+			visited.set(current.id, true)
+			crash += 1
+
+			let current_edge = current.incident_edge
+			let intersection_cnt = 0
+			let temp_highlight = []
+			do {
+				let node_start_x =  current_edge.orig.pos[0]
+				let node_start_y = current_edge.orig.pos[1]
+
+				let node_end_x =  current_edge.dest.pos[0]
+				let node_end_y = current_edge.dest.pos[1]
+
+				temp_highlight.push([node_start_x, node_start_y])
+				temp_highlight.push([node_end_x, node_end_y])
+
+				let [a, b] = segment_intersection(start_point_x, start_point_y, pt[0], pt[1], node_start_x, node_start_y, node_end_x, node_end_y)
+
+				if (on_segment(node_start_x, node_start_y, node_end_x, node_end_y, a, b)) {
+					this.points.add_point(a, b)
+					intersection_cnt += 1
+				}
+				current_edge = current_edge.next
+			} while (current_edge != current.incident_edge)
+
+			if (intersection_cnt >= 2) { // segment is in the triangle
+				//TODO HIGHLIGHT, for the moment its shit ...
+				for(let i = 0; i < temp_highlight.length; i++) {
+					this.points.add_point(...temp_highlight[i])
+				}
+
+				// ADD neighboor
+				let current_edge = current.incident_edge
+
+				do {
+					let oppo_edge = current_edge.oppo
+					if (oppo_edge != -1) {
+						q.push(oppo_edge.incidentFace)
+					}
+					current_edge = current_edge.next
+				} while (current_edge !=  current.incident_edge)
+			}
+		}
+	}
+
+	draw(gl, render_state, model_matrix) {
+		line_color = [1.0, 0.0, 0.0]
+		gl.lineWidth(10)
+		this.lines.draw(gl, render_state, model_matrix)
+		gl.lineWidth(3)
+		line_color = [0.0, 1.0, 0.0]
+		intersection_color = [1.0, 1.0, 0.0]
+		this.points.draw(gl, render_state, model_matrix)
+		intersection_color = [1.0, 0.0, 0.0]
+
 	}
 }
 
@@ -445,15 +579,7 @@ class Lines {
 		this.gl = gl
 	}
 
-	add_line(x1, y1, x2, y2, pt) {
-		for(let i = 0; pt && i < this.segments.length; i++) {
-			let [a, b] = segment_intersection(this.segments[i][0], this.segments[i][1], this.segments[i][2], this.segments[i][3], x1, y1, x2, y2)
-
-			if (on_segment(x1, y1, x2, y2, a, b) && on_segment(this.segments[i][0], this.segments[i][1], this.segments[i][2], this.segments[i][3], a, b)) {
-				pt.add_point(a, b)
-			}
-		}
-
+	add_line(x1, y1, x2, y2) {
 		const index = this.vertices.length / 3
 
 		this.vertices.push(x1)
@@ -524,7 +650,9 @@ class Geonum {
 		// MARKER
 		this.model = new Model(this.gl, mesh)
 
-		this.mesh = new Mesh(mesh)
+		this.mesh = new Mesh(mesh, this.gl)
+
+		this.mesh.marching_triangle([0.11404410041538215, 0.931412313029647])
 
 		zoom = 1
 		px = 0
@@ -548,22 +676,11 @@ class Geonum {
 		canvas.addEventListener("click", event => {
 			const shift = event.getModifierState("Shift")
 
-			if (has_prev && !shift && part === 1) {
-				has_prev = false
-				this.lines.add_line(prev_x * Z_OFFSET * zoom - target_px, prev_y * Z_OFFSET * zoom - target_py, target_mx * Z_OFFSET * zoom - target_px, -target_my * Z_OFFSET * zoom - target_py, this.points)
-			} else if (!shift && part === 2) {
-				const world_x = target_mx * Z_OFFSET * zoom - target_px
-				const world_y = -target_my * Z_OFFSET * zoom - target_py
-				const indicies = this.mesh.get_triangle_from_point(world_x, world_y)
-				if(indicies !== -1) {
-					this.mesh.highlight_triangle = indicies
-				}
-			}
-			else {
-				has_prev = !shift
-				prev_x = target_mx
-				prev_y = -target_my
-			}
+			const world_x = target_mx * Z_OFFSET * zoom - target_px
+			const world_y = -target_my * Z_OFFSET * zoom - target_py
+
+			console.log(world_x, world_y)
+
 		}, false)
 
 		canvas.addEventListener("mousedown", event => {
@@ -589,7 +706,6 @@ class Geonum {
 
 		this.gl.viewport(0, 0, this.x_res, this.y_res)
 
-		this.gl.enable(this.gl.POINT_SMOOTH)
 		this.gl.lineWidth(3)
 		this.gl.disable(this.gl.DEPTH_TEST)
 		this.gl.enable(this.gl.CULL_FACE)
@@ -733,10 +849,8 @@ class Geonum {
 		this.gl.uniform3f(this.render_state.color_uniform, ...default_color)
 		this.gl.uniform3f(this.render_state.vertex_indices_uniform, -1, -1, -1)
 
-		
-		//this.mesh.draw(this.gl, this.render_state, model_matrix)
 		this.model.draw(this.gl, this.render_state, model_matrix)
-		
+		this.mesh.draw(this.gl, this.render_state, model_matrix)
 
 		requestAnimationFrame((now) => this.render(now))
 	}
