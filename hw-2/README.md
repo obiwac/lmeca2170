@@ -4,29 +4,36 @@
 
 Open the `index.html` in your browser.
 
-> :warning: **If rounded nodes are blinking**: Please disable hardware acceleration.
-
 ## Controls
 
 |Control|Description|
 |-|-|
 |Scroll wheel|Zooms the camera in and out.|
-|Left click|Interact with the scene (add line in part 1, select triangle in part 2).|
 |Shift + left click and drag|Move the camera around the scene.|
-|Click button|Toggle between parts 1 and 2.|
 
 ## How it works
 
-The project uses WebGL 2.
+The project uses WebGL 2. Wich is vanilla.
 
-### Line intersection (part 1)
+### Half-edge data structure (part 1)
+Here is the following structure:\
+mesh.nodes: an array of nodes\
+[-] node.id: a unique integer identifying the node (use the indices given in the JSON file).\
+[-] node.pos: a pair of coordinates representing the position of the node.
+mesh.faces: an array of faces\
+[-] face.id: a unique integer identifying the face.\
+[-] face.incidentEdge: one (!) edge that is incident to face.\
+mesh.edges: an array of (half-)edges; an edge has structure\
+[-] edge.orig: the origin node of the half-edge.\
+[-] edge.dest: the destination node of the half-edge.\
+[-] edge.incidentFace: the face to the left of the half-edge.\
+[-] edge.next: the next half-edge on the boundary of the incident face.\
+[-] edge.oppo: the opposite half-edge.\
+### Point location (part 2)
+There is a function called `marching_triangle` wich takes 3 arguments, for point locations you can pass `undefined` to origin and if you want to vizualise the triangle you have to pass true to `find_triangle`. for eg.
+```
+marching_triangle([0.11404410041538215, 0.931412313029647], undefined, true)
+```
 
-For each line created, we check every other lines and check for their intersections.
-Intersection points are shown with a red circle.
-
-In the degenerate case, an alert is shown to the user and no intersection point is added.
-
-### Triangle detection (part 2)
-
-When the mesh is clicked, we check for every triangle if the point where the user clicked is inside the triangle with barycentric coordinates.
-When the point is located inside a triangle, it turns pink.
+### Intersection segment-mesh (part 3)
+It is the same as part 2, except you need to pass the `origin` argument which is the second point of the segment.
