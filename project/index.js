@@ -100,6 +100,22 @@ function anim_vec(x, target, multiplier) {
 	return vec
 }
 
+canvas.addEventListener("mousemove", e => {
+	e.preventDefault()
+
+	if (e.buttons & 0b1) {
+		target_pos[0] += e.movementX / 400 * -target_pos[2]
+		target_pos[1] -= e.movementY / 400 * -target_pos[2]
+	}
+})
+
+canvas.addEventListener("wheel", e => {
+	e.preventDefault()
+
+	target_pos[2] -= e.deltaY / 800
+	target_pos[2] = Math.min(target_pos[2], -.2)
+})
+
 // rendering
 
 let prev = 0
@@ -115,17 +131,17 @@ function render(now) {
 
 	// update camera parameters
 
-	pos = anim_vec(pos, target_pos, dt * 5)
+	pos = anim_vec(pos, target_pos, dt * 15)
 
 	// clear screen
 
-	gl.clearColor(0, 0, 0, 0)
+	gl.clearColor(0, 0, 0, 1)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 
 	// projection stuff
 
 	const proj_mat = new Mat()
-	proj_mat.perspective(TAU / 6, x_res / y_res, 0.2, 200)
+	proj_mat.perspective(TAU / 6, x_res / y_res, .1, 200)
 
 	const view_mat = new Mat()
 	view_mat.translate(...pos)
