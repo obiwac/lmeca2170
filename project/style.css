@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
+
+:root {
+	--gradient: -webkit-linear-gradient(50deg, rgb(7, 149, 250), rgb(255, 20, 80));
+	--background-colour: #ffffff;
+	--title-colour: #000000;
+	--text-colour: #000000;
+	--muted-colour: #555555;
+	--border-radius: 12px;
+	--code-background: #ddd;
+	--content-width: 950px;
+}
+
+@media (prefers-color-scheme: light) {
+	/* leave it as default */
+	/* light is default because accessibility */
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--gradient: -webkit-linear-gradient(50deg, rgb(7, 149, 250), rgb(255, 20, 80));
+		--background-colour: #111;
+		--title-colour: #ffffff;
+		--text-colour: #dddddd;
+		--muted-colour: #999999;
+		--code-background: #222;
+	}
+}
+
+body {
+	background-color: var(--background-colour);
+	color: var(--text-colour);
+	margin: 0;
+
+	font-size: 20px;
+	font-display: optional;
+	font-family: "Montserrat", sans-serif, "Noto Color Emoji", sans-serif;
+	word-break: break-word;
+}
+
+h1, h2 {
+	color: var(--title-colour);
+}
+
+h1 {
+	font-size: 90px;
+	margin-block: 16px;
+}
+
+strong {
+	background: var(--gradient);
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	font-weight: bold;
+}
+
+code {
+	border-radius: 8px;
+	background-color: var(--code-background);
+}
+
+a {
+	text-decoration: none;
+	background: var(--gradient);
+	background-clip: none;
+	color: var(--background-colour);
+	font-weight: bold;
+	border-radius: 3px;
+}
+
+a:hover {
+	/* transitions for gradients annoyingly aren't supported in most browsers */
+	background: var(--text-colour);
+}
+
+.container {
+	max-width: var(--content-width);
+	margin: auto;
+	padding: 32px;
+}
