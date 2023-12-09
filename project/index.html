@@ -6,10 +6,32 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="style.css">
 
-		<script src="nodes_coarse.txt"></script>
+		<script src="nodes_coarse.txt"></script> <!-- XXX no clue why this was given to us with a .txt extension -->
 		<script src="matrix.js"></script>
 		<script src="shader.js"></script>
 		<script src="index.js" defer></script> <!-- defer to execute after the window has been loaded -->
+
+		<!-- node shader -->
+
+		<script id="node-vert" type="x-shader/x-vertex">#version 300 es
+			precision mediump float;
+			layout(location = 0) in vec2 node;
+			uniform mat4 u_mvp;
+
+			void main(void) {
+				gl_Position = u_mvp * vec4(node, 0.0, 1.0);
+			}
+		</script>
+
+		<script id="node-frag" type="x-shader/x-fragment">#version 300 es
+			precision mediump float;
+			out vec4 out_colour;
+
+			void main(void) {
+				// out_colour = vec4(0.0, 0.0, 0.1, 1.0);
+				out_colour = vec4(1.0, 0.9, 0.8, 1.0);
+			}
+		</script>
 	</head>
 	<body>
 		<div class="container">
