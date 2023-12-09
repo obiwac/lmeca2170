@@ -37,13 +37,11 @@ class Shader {
 
 		// common uniforms
 
-		this.mvp_uniform = gl.getUniformLocation(this.program, "mvp_matrix")
-		this.anim_uniform = gl.getUniformLocation(this.program, "anim")
+		this.mvp_uniform = gl.getUniformLocation(this.program, "u_mvp")
 	}
 
 	use() {
 		gl.useProgram(this.program)
-		cur_shader = this
 	}
 
 	/** @function
@@ -51,12 +49,5 @@ class Shader {
 	  */
 	mvp(mat) {
 		gl.uniformMatrix4fv(this.mvp_uniform, false, mat.data.flat())
-	}
-
-	/** @function
-	  * @param {number} x
-	  */
-	anim(x) {
-		gl.uniform1f(this.anim_uniform, x)
 	}
 }

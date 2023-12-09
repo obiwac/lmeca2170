@@ -1,4 +1,7 @@
+// a few constants up top
+
 const TAU = 2 * Math.PI
+const FLOAT32_SIZE = 4
 
 // initialize WebGL context
 
@@ -58,7 +61,7 @@ class Node {
 		gl.bufferData(gl.ARRAY_BUFFER, this.vbo_data, gl.STATIC_DRAW)
 
 		gl.enableVertexAttribArray(0)
-		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0)
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
 
 		this.ibo = gl.createBuffer()
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
@@ -72,6 +75,30 @@ class Node {
 }
 
 const node = new Node()
+const node_shader = new Shader("node")
+
+// camera controls
+
+let pos = [0, 0, 0]
+let target_pos = [0, 0, -1]
+
+function anim(x, target, multiplier) {
+	if (multiplier > 1) {
+		return target
+	}
+
+	return x + (target - x) * multiplier
+}
+
+function anim_vec(x, target, multiplier) {
+	let vec = structuredClone(x)
+
+	for (let i = 0; i < x.length; i++) {
+		vec[i] = anim(x[i], target[i], multiplier)
+	}
+
+	return vec
+}
 
 // rendering
 
@@ -86,10 +113,39 @@ function render(now) {
 	prev = now
 	time += dt
 
+	// update camera parameters
+
+	pos = anim_vec(pos, target_pos, dt * 5)
+
 	// clear screen
 
-	gl.clearColor(1, 0, 1, 1)
+	gl.clearColor(0, 0, 0, 0)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+
+	// projection stuff
+
+	const proj_mat = new Mat()
+	proj_mat.perspective(TAU / 6, x_res / y_res, 0.2, 200)
+
+	const view_mat = new Mat()
+	view_mat.translate(...pos)
+	// view_mat.rotate_2d(time, 0)
+
+	const vp_mat = new Mat(view_mat)
+	vp_mat.multiply(proj_mat)
+
+	const model_mat = new Mat()
+	const mvp_mat = new Mat(model_mat)
+	mvp_mat.multiply(vp_mat)
+
+	// render nodes
+
+	node_shader.use()
+	node_shader.mvp(mvp_mat)
+
+	// for (const [x, y] of nodeData) {
+		node.draw()
+	// }
 
 	// continue render loop
 
