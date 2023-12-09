@@ -1,7 +1,6 @@
 // initialize WebGL context
 
 const canvas = document.getElementById("canvas")
-console.log(canvas)
 
 /** @type {WebGLRenderingContext | WebGL2RenderingContext} */
 const gl = canvas.getContext("webgl2") || canvas.getContext("experimental-webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl")
