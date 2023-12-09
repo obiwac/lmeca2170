@@ -80,3 +80,13 @@ a:hover {
 	margin: auto;
 	padding: 32px;
 }
+
+.canvas-container {
+	display: flex;
+	justify-content: center;
+}
+
+canvas {
+	max-width: 700px;
+	border-radius: var(--border-radius);
+}
