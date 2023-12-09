@@ -24,7 +24,7 @@ gl.viewport(0, 0, x_res, y_res)
 
 class Node {
 	constructor() {
-		const RADIUS = 0.5
+		const RADIUS = 0.1
 		const DETAIL = 32
 
 		let vertices = []
@@ -43,8 +43,8 @@ class Node {
 
 		// generate indices for all triangles
 
-		for (let i = 0; i < DETAIL - 1; i++) {
-			indices.push(0, i ? DETAIL : i + 1, i + 2)
+		for (let i = 0; i < DETAIL; i++) {
+			indices.push(0, i + 1, i ? i : DETAIL)
 		}
 
 		/** @type: Float32Array */
