@@ -24,7 +24,7 @@ gl.viewport(0, 0, x_res, y_res)
 
 class Node {
 	constructor() {
-		const RADIUS = 0.1
+		const RADIUS = 0.02
 		const DETAIL = 32
 
 		let vertices = []
@@ -79,8 +79,8 @@ const node_shader = new Shader("node")
 
 // camera controls
 
-let pos = [0, 0, 0]
-let target_pos = [0, 0, -1]
+let pos = [-.5, -.5, 0]
+let target_pos = [-.5, -.5, -1]
 
 function anim(x, target, multiplier) {
 	if (multiplier > 1) {
@@ -129,7 +129,6 @@ function render(now) {
 
 	const view_mat = new Mat()
 	view_mat.translate(...pos)
-	// view_mat.rotate_2d(time, 0)
 
 	const vp_mat = new Mat(view_mat)
 	vp_mat.multiply(proj_mat)
@@ -141,11 +140,13 @@ function render(now) {
 	// render nodes
 
 	node_shader.use()
-	node_shader.mvp(mvp_mat)
 
-	// for (const [x, y] of nodeData) {
+	for (const [x, y] of nodeData) {
+		mvp_mat.translate(x, y, 0)
+		node_shader.mvp(mvp_mat)
 		node.draw()
-	// }
+		mvp_mat.translate(-x, -y, 0)
+	}
 
 	// continue render loop
 
