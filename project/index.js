@@ -60,6 +60,8 @@ class Nodes {
 		let indices = []
 
 		for (const node of this.nodes) {
+			const off = vertices.length / 2
+
 			// centre vertex all triangles will fan out from
 
 			vertices.push(node.x, node.y)
@@ -72,8 +74,6 @@ class Nodes {
 			}
 
 			// generate indices for all triangles
-
-			const off = vertices.length
 
 			for (let i = 0; i < DETAIL; i++) {
 				indices.push(off, off + i + 1, off + (i ? i : DETAIL))
