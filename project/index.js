@@ -152,14 +152,26 @@ class Triangles {
 		let vertices = []
 		let indices = []
 
+		function shifted_coord(main_node, other_node_1, other_node_2) {
+			const dx = main_node.x - (other_node_1.x + other_node_2.x) / 2
+			const dy = main_node.y - (other_node_1.y + other_node_2.y) / 2
+
+			const norm = Math.sqrt(dx * dx + dy * dy)
+
+			const nx = dx / norm * -0.01
+			const ny = dy / norm * -0.01
+
+			return [main_node.x + nx, main_node.y + ny]
+		}
+
 		for (const triangle of this.triangles) {
 			const off = vertices.length / 2
 
 			// generate vertices
 
-			vertices.push(triangle.a.x, triangle.a.y)
-			vertices.push(triangle.b.x, triangle.b.y)
-			vertices.push(triangle.c.x, triangle.c.y)
+			vertices.push(...shifted_coord(triangle.a, triangle.b, triangle.c))
+			vertices.push(...shifted_coord(triangle.b, triangle.a, triangle.c))
+			vertices.push(...shifted_coord(triangle.c, triangle.a, triangle.b))
 
 			// generate indices
 
