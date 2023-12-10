@@ -13,9 +13,10 @@ Open the `index.html` in your browser.
 
 ## How it works
 
-The project uses WebGL 2. Wich is vanilla.
+The project uses WebGL 2 which is vanilla.
 
 ### Half-edge data structure (part 1)
+
 Here is the following structure:\
 mesh.nodes: an array of nodes\
 [-] node.id: a unique integer identifying the node (use the indices given in the JSON file).\
@@ -29,11 +30,16 @@ mesh.edges: an array of (half-)edges; an edge has structure\
 [-] edge.incidentFace: the face to the left of the half-edge.\
 [-] edge.next: the next half-edge on the boundary of the incident face.\
 [-] edge.oppo: the opposite half-edge.\
+
 ### Point location (part 2)
-There is a function called `marching_triangle` wich takes 3 arguments, for point locations you can pass `undefined` to origin and if you want to vizualise the triangle you have to pass true to `find_triangle`. for eg.
+
+There is a function called `marching_triangle`.
+For point locations you can pass `undefined` to `origin` and if you want to visualize the triangle you have to pass true to `find_triangle`, e.g.
+
 ```
 marching_triangle([0.11404410041538215, 0.931412313029647], undefined, true)
 ```
 
 ### Intersection segment-mesh (part 3)
+
 It is the same as part 2, except you need to pass the `origin` argument which is the second point of the segment.
