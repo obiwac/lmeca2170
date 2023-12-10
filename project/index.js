@@ -111,6 +111,94 @@ class Nodes {
 const nodes = new Nodes(nodeData)
 const node_shader = new Shader("node")
 
+// triangles
+
+class Triangle {
+	/** @function
+	  * @param {Node} a
+	  * @param {Node} b
+	  * @param {Node} c
+	  */
+	constructor(a, b, c) {
+		this.a = a
+		this.b = b
+		this.c = c
+	}
+}
+
+class Triangles {
+	/** @function
+	  * @param {Triangle[]} triangles
+	  */
+	constructor(triangles) {
+		this.triangles = triangles
+
+		this.vao = gl.createVertexArray()
+		gl.bindVertexArray(this.vao)
+
+		this.vbo = gl.createBuffer()
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+
+		gl.enableVertexAttribArray(0)
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+
+		this.ibo = gl.createBuffer()
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+	}
+
+	update_mesh() {
+		// create mesh data
+
+		let vertices = []
+		let indices = []
+
+		for (const triangle of this.triangles) {
+			const off = vertices.length / 2
+
+			// generate vertices
+
+			vertices.push(triangle.a.x, triangle.a.y)
+			vertices.push(triangle.b.x, triangle.b.y)
+			vertices.push(triangle.c.x, triangle.c.y)
+
+			// generate indices
+
+			indices.push(off, off + 1, off + 2)
+		}
+
+		this.indices_length = indices.length
+
+		/** @type: Float32Array */
+		const vbo_data = new Float32Array(vertices)
+
+		/** @type: Uint32Array */
+		const ibo_data = new Uint32Array(indices)
+
+		// upload mesh data to GPU
+
+		gl.bindVertexArray(this.vao)
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+		gl.bufferData(gl.ARRAY_BUFFER, vbo_data, gl.STATIC_DRAW)
+
+		gl.enableVertexAttribArray(0)
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ibo_data, gl.STATIC_DRAW)
+	}
+
+	draw() {
+		gl.bindVertexArray(this.vao)
+		gl.drawElements(gl.TRIANGLES, this.indices_length, gl.UNSIGNED_INT, 0)
+	}
+}
+
+const triangles = new Triangles([
+	new Triangle(nodes.nodes[0], nodes.nodes[1], nodes.nodes[2]),
+	new Triangle(nodes.nodes[0], nodes.nodes[1], nodes.nodes[3]),
+])
+
 // camera controls
 
 let pos = [-.5, -.5, 0]
@@ -194,6 +282,11 @@ function render(now) {
 
 	nodes.update_mesh()
 	nodes.draw()
+
+	// render Triangles
+
+	triangles.update_mesh()
+	triangles.draw()
 
 	// continue render loop
 
