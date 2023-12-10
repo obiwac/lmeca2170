@@ -211,6 +211,8 @@ const triangles = new Triangles([
 	new Triangle(nodes.nodes[0], nodes.nodes[1], nodes.nodes[3]),
 ])
 
+const triangle_shader = new Shader("tri")
+
 // camera controls
 
 let pos = [-.5, -.5, 0]
@@ -267,7 +269,10 @@ function render(now) {
 
 	pos = anim_vec(pos, target_pos, dt * 15)
 
-	// clear screen
+	// clear screen (and other GL state stuff)
+
+	gl.enable(gl.BLEND)
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
 	gl.clearColor(0, 0, 0, 1)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -287,6 +292,14 @@ function render(now) {
 	const mvp_mat = new Mat(model_mat)
 	mvp_mat.multiply(vp_mat)
 
+	// render triangles
+
+	triangle_shader.use()
+	triangle_shader.mvp(mvp_mat)
+
+	triangles.update_mesh()
+	triangles.draw()
+
 	// render nodes
 
 	node_shader.use()
@@ -294,11 +307,6 @@ function render(now) {
 
 	nodes.update_mesh()
 	nodes.draw()
-
-	// render Triangles
-
-	triangles.update_mesh()
-	triangles.draw()
 
 	// continue render loop
 
