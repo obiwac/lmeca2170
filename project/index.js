@@ -22,13 +22,6 @@ gl.viewport(0, 0, x_res, y_res)
 
 // nodes
 
-class Node {
-	constructor(x, y) {
-		this.x = x
-		this.y = y
-	}
-}
-
 class Nodes {
 	constructor(nodeData) {
 		this.nodes = []
@@ -116,19 +109,6 @@ const nodes = new Nodes(nodeData)
 const node_shader = new Shader("node")
 
 // triangles
-
-class Triangle {
-	/** @function
-	  * @param {Node} a
-	  * @param {Node} b
-	  * @param {Node} c
-	  */
-	constructor(a, b, c) {
-		this.a = a
-		this.b = b
-		this.c = c
-	}
-}
 
 class Triangles {
 	/** @function
