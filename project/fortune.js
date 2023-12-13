@@ -54,43 +54,10 @@ function fortune(points) {
                 beachline.root = new BeachNode(current_event[0])
                 continue
             }
-
-            /*if (beachline.root.is_leaf && beachline.root.site.y - current_event[0].y < 1) {
-                // On a deux sites qui ont des y très proches
-                // On va donc créer un arc de cercle
-                console.log("ici")
-                let arc = beachline.root
-                let p1 = arc.site
-                let p2 = current_event[0]
-                let startx = (p1.x + p2.x) / 2
-                let starty = (p1.y + p2.y) / 2
-
-                let edge = new Edge(new Point(startx, starty), p1, p2)
-                arc.edge = edge
-                arc.is_leaf = false
-
-                let new_arc = new BeachNode(current_event[0])
-                let new_arc2 = new BeachNode(arc.site)
-
-                arc.left = new_arc
-                arc.right = new_arc2
-
-                new_arc.parent = arc
-                new_arc2.parent = arc
-
-                new_arc.edge = edge
-                new_arc2.edge = edge
-
-                continue
-            }*/
-
-            console.log(current_event[0])
-
             // On cherche l'arc qui est au dessus du point
 
-            //TODO FIX THIS
             let above_arc = beachline.find_arc_above(current_event[0])
-            console.log("above arc", above_arc)
+            console.log("above arc", above_arc.site)
 
             let left_arc = new BeachNode(above_arc.site);
             let middle_arc = new BeachNode(current_event[0]);
