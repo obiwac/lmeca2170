@@ -11,16 +11,16 @@
 */
 class BeachNode {
 	constructor(site) {
-		this.site = site;
+		this.site = site
 
 		this.left = null
 		this.right = null
 
 		this.parent = null
-		this.edge = null;
+		this.edge = null
 
-		this.circleEvent = null;
-		this.is_leaf = true;
+		this.circleEvent = null
+		this.is_leaf = true
 
 	}
 
@@ -56,8 +56,8 @@ class BeachNode {
 		console.log("set parent called with: ", node, " to ", this)
 
 		// Ça arrive quand c'est la première feuille dans l'abre (quand la feuille est la racine)
-		if(node.parrent == null ) {
-			this.parent = null;
+		if(node.parent == null ) {
+			this.parent = null
 			return
 		}
 
@@ -91,52 +91,52 @@ class Edge extends BeachNode {
 
 class BeachTree {
 	constructor() {
-		this.root = null;
+		this.root = null
 	}
 
 	get_first_parent_on_left(node) {
-		let current_node = node;
+		let current_node = node
 		
 		while (current_node.parent != null && current_node.parent.left == current_node) {
-			current_node = current_node.parent;
+			current_node = current_node.parent
 		}
 		
-		return current_node.parent;
+		return current_node.parent
 	}
 
 	get_first_parent_on_right(node) {
-		let current_node = node;
+		let current_node = node
 		while (current_node.parent != null && current_node.parent.right == current_node) {
-			current_node = current_node.parent;
+			current_node = current_node.parent
 		}
 				
-		return current_node.parent;
+		return current_node.parent
 	}
 
 	get_first_leaf_on_left(node) {
 		if (node.left == null) {
-			return null;
+			return null
 		}
 		
-		let current_node = node.left;
+		let current_node = node.left
 		
 		while (current_node.is_leaf == false) {
-			current_node = current_node.right;
+			current_node = current_node.right
 		}
 
-		return current_node;
+		return current_node
 	}
 
 	get_first_leaf_on_right(node) {
 		if (node.right == null) {
-			return null;
+			return null
 		}
-		let current_node = node.right;
+		let current_node = node.right
 		while (current_node.is_leaf == false) {
-			current_node = current_node.left;
+			current_node = current_node.left
 		}
 
-		return current_node;
+		return current_node
 	}
 	
 	/*
@@ -147,49 +147,49 @@ class BeachTree {
 		let right = this.get_first_leaf_on_right(node)
 
 		
-		let p = left.site;
-		let r = right.site;
+		let p = left.site
+		let r = right.site
 
 		console.log(left, right)
 
-		let dp = 2 * (p.y - directrix);
-		const a1 = 1 / dp;
-		const b1 = -2 * p.x / dp;
-		const c1 = directrix + dp / 4 + p.x * p.x / dp;
+		let dp = 2 * (p.y - directrix)
+		const a1 = 1 / dp
+		const b1 = -2 * p.x / dp
+		const c1 = directrix + dp / 4 + p.x * p.x / dp
 
 		
-		dp = 2 * (r.y - directrix);
-		const a2 = 1 / dp;
-		const b2 = -2 * r.x / dp;
-		const c2 = directrix + dp / 4 + r.x * r.x / dp;
+		dp = 2 * (r.y - directrix)
+		const a2 = 1 / dp
+		const b2 = -2 * r.x / dp
+		const c2 = directrix + dp / 4 + r.x * r.x / dp
 
-		const a = a1 - a2;
-		const b = b1 - b2;
-		const c = c1 - c2;
+		const a = a1 - a2
+		const b = b1 - b2
+		const c = c1 - c2
 		
 
-		const disc = b * b - 4 * a * c;
-		const x1 = (-b + Math.sqrt(disc)) / (2 * a);
-		const x2 = (-b - Math.sqrt(disc)) / (2 * a);
+		const disc = b * b - 4 * a * c
+		const x1 = (-b + Math.sqrt(disc)) / (2 * a)
+		const x2 = (-b - Math.sqrt(disc)) / (2 * a)
 
 
 		if (p.y < r.y) {
-			return Math.max(x1, x2);
+			return Math.max(x1, x2)
 		} else {
-			return Math.min(x1, x2);
+			return Math.min(x1, x2)
 		}
 	}
 	
 	find_arc_above(site) {
-		let current_node = this.root;
+		let current_node = this.root
 		while (current_node.is_leaf == false) {
-			let x = this.get_x_of_edge(current_node, site.y);
+			let x = this.get_x_of_edge(current_node, site.y)
 			if( x > site.x) {
-				current_node = current_node.left;
+				current_node = current_node.left
 			} else {
-				current_node = current_node.right;
+				current_node = current_node.right
 			}
 		}
-		return current_node;
+		return current_node
 	}
 } 

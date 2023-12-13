@@ -1,8 +1,7 @@
-
 class Point {
     constructor(x, y) {
-        this.x = x;
-        this.y = y;
+        this.x = x
+        this.y = y
     }
 }
 
@@ -16,14 +15,13 @@ class IncompleteEdge {
     }
 }
 
-
 function get_y(p, x, directrix) {
-    const dp = 2 * (p.y - directrix);
-    const a1 = 1 / dp;
-    const b1 = -2 * p.x / dp;
-    const c1 = directrix + dp / 4 + p.x * p.x / dp;
+    const dp = 2 * (p.y - directrix)
+    const a1 = 1 / dp
+    const b1 = -2 * p.x / dp
+    const c1 = directrix + dp / 4 + p.x * p.x / dp
 
-    return a1 * x * x + b1 * x + c1;
+    return a1 * x * x + b1 * x + c1
 }
 
 // Desc: Implementation of the fortune algorithm for generating voronoi diagrams
@@ -43,10 +41,10 @@ function fortune(points) {
     let head = queue.length - 1
 
     queue.sort((a, b) => { return a[0].y - b[0].y })
-    const beachline = new BeachTree();
+    const beachline = new BeachTree()
 
     while (head >= 0) {
-        current_event = queue[head--];
+        current_event = queue[head--]
 
         if (current_event[1] == events.site) {            
             
@@ -59,9 +57,9 @@ function fortune(points) {
             let above_arc = beachline.find_arc_above(current_event[0])
             console.log("above arc", above_arc.site)
 
-            let left_arc = new BeachNode(above_arc.site);
-            let middle_arc = new BeachNode(current_event[0]);
-            let right_arc = new BeachNode(above_arc.site);
+            let left_arc = new BeachNode(above_arc.site)
+            let middle_arc = new BeachNode(current_event[0])
+            let right_arc = new BeachNode(above_arc.site)
 
             let start_point = new Point(current_event[0], get_y(current_event[0], above_arc.site.x, current_event[0].y))
             
