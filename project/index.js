@@ -76,6 +76,7 @@ class Node {
 
 const node = new Node()
 const node_shader = new Shader("node")
+fortune(nodeData)
 
 // camera controls
 
@@ -168,5 +169,4 @@ function render(now) {
 
 	requestAnimationFrame(render)
 }
-
 requestAnimationFrame(render)
