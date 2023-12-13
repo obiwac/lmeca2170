@@ -1,13 +1,5 @@
-class Point {
-    constructor(x, y) {
-        this.x = x
-        this.y = y
-    }
-}
-
 class IncompleteEdge {
     constructor(p1, p2, startx) {
-        
         this.slope = (p1.y - p2.y) / (p1.x - p2.x)
 
         this.end = null
@@ -24,8 +16,11 @@ function get_y(p, x, directrix) {
     return a1 * x * x + b1 * x + c1
 }
 
-// Desc: Implementation of the fortune algorithm for generating voronoi diagrams
-function fortune(points) {
+/** @function
+  * @param {Node[]} nodes
+  * @returns {Triangle[]}
+  */
+function fortune(nodes) {
     const events = {
         "site": 0,
         "circle": 1,
@@ -34,13 +29,14 @@ function fortune(points) {
     }
 
     let queue = []
-    for (const p of points) {
-        queue.push([new Point(p[0], p[1]), events.site])
+
+    for (const node of nodes) {
+        queue.push([node, events.site])
     }
 
     let head = queue.length - 1
 
-    queue.sort((a, b) => { return a[0].y - b[0].y })
+    queue.sort((a, b) => a[0].y - b[0].y)
     const beachline = new BeachTree()
 
     while (head >= 0) {

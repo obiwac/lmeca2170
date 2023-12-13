@@ -106,11 +106,14 @@ class Nodes {
 		gl.bindVertexArray(this.vao)
 		gl.drawElements(gl.TRIANGLES, this.indices_length, gl.UNSIGNED_INT, 0)
 	}
+
+	fortune() {
+		return fortune(this.nodes)
+	}
 }
 
 const nodes = new Nodes(nodeData)
 const node_shader = new Shader("node")
-fortune(nodeData)
 
 // triangles
 
@@ -207,11 +210,7 @@ class Triangles {
 	}
 }
 
-const triangles = new Triangles([
-	new Triangle(nodes.nodes[0], nodes.nodes[1], nodes.nodes[2]),
-	new Triangle(nodes.nodes[0], nodes.nodes[1], nodes.nodes[3]),
-])
-
+const triangles = new Triangles(nodes.fortune())
 const triangle_shader = new Shader("tri")
 
 // camera controls
