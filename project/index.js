@@ -112,6 +112,8 @@ canvas.addEventListener("mousemove", e => {
 canvas.addEventListener("wheel", e => {
 	e.preventDefault()
 
+	// TODO make zooming follow a quadratic curve
+
 	target_pos[2] -= e.deltaY / 800
 	target_pos[2] = Math.min(target_pos[2], -.2)
 })
