@@ -42,30 +42,30 @@ function fortune(nodes) {
 	while (head >= 0) {
 		current_event = queue[head--]
 
-		if (current_event[1] == events.site) {			
-			
+		if (current_event[1] == events.site) {
 			if(beachline.root == null) {
 				beachline.root = new BeachNode(current_event[0])
 				continue
 			}
+
 			// On cherche l'arc qui est au dessus du point
 
-			let above_arc = beachline.find_arc_above(current_event[0])
+			const above_arc = beachline.find_arc_above(current_event[0])
 			console.log("above arc", above_arc.site)
 
-			let left_arc = new BeachNode(above_arc.site)
-			let middle_arc = new BeachNode(current_event[0])
-			let right_arc = new BeachNode(above_arc.site)
+			const left_arc = new BeachNode(above_arc.site)
+			const middle_arc = new BeachNode(current_event[0])
+			const right_arc = new BeachNode(above_arc.site)
 
-			let start_point = new Point(current_event[0], get_y(current_event[0], above_arc.site.x, current_event[0].y))
-			
-			let edge_left = new Edge(start_point, above_arc.site, current_event[0])
-			let edge_right = new Edge(start_point, current_event[0], above_arc.site)
+			const start_point = new Point(current_event[0], get_y(current_event[0], above_arc.site.x, current_event[0].y))
+
+			const edge_left = new Edge(start_point, above_arc.site, current_event[0])
+			const edge_right = new Edge(start_point, current_event[0], above_arc.site)
 
 			edge_left.set_parent(above_arc)
 			edge_left.set_left(left_arc)
 			edge_left.set_right(edge_right)
-			
+
 			edge_right.set_left(middle_arc)
 			edge_right.set_right(right_arc)
 
@@ -74,9 +74,9 @@ function fortune(nodes) {
 				console.log("L'arc au dessu est le root")
 				beachline.root = edge_left
 			}
+		}
 
-
-		} else if (current_event.type == events.circle) {
+		else if (current_event.type == events.circle) {
 			// TODO
 		}
 	}
