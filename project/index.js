@@ -23,59 +23,195 @@ gl.viewport(0, 0, x_res, y_res)
 // nodes
 
 class Node {
-	constructor() {
-		const RADIUS = 0.02
-		const DETAIL = 32
+	constructor(x, y) {
+		this.x = x
+		this.y = y
+	}
+}
 
-		let vertices = []
-		let indices = []
+class Nodes {
+	constructor(nodeData) {
+		this.nodes = []
 
-		// centre vertex all triangles will fan out from
-
-		vertices.push(0, 0)
-
-		// generate surrounding vertices
-
-		for (let i = 0; i < DETAIL; i++) {
-			const angle = (i / DETAIL) * TAU
-			vertices.push(Math.cos(angle) * RADIUS, Math.sin(angle) * RADIUS)
+		for (const [x, y] of nodeData) {
+			this.nodes.push(new Node(x, y))
 		}
-
-		// generate indices for all triangles
-
-		for (let i = 0; i < DETAIL; i++) {
-			indices.push(0, i + 1, i ? i : DETAIL)
-		}
-
-		/** @type: Float32Array */
-		this.vbo_data = new Float32Array(vertices)
-
-		/** @type: Uint8Array */
-		this.indices = new Uint8Array(indices)
 
 		this.vao = gl.createVertexArray()
 		gl.bindVertexArray(this.vao)
 
 		this.vbo = gl.createBuffer()
 		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bufferData(gl.ARRAY_BUFFER, this.vbo_data, gl.STATIC_DRAW)
 
 		gl.enableVertexAttribArray(0)
 		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
 
 		this.ibo = gl.createBuffer()
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.indices, gl.STATIC_DRAW)
+	}
+
+	update_mesh() {
+		// create mesh data
+
+		const RADIUS = 0.02
+		const DETAIL = 32
+
+		let vertices = []
+		let indices = []
+
+		for (const node of this.nodes) {
+			const off = vertices.length / 2
+
+			// centre vertex all triangles will fan out from
+
+			vertices.push(node.x, node.y)
+
+			// generate surrounding vertices
+
+			for (let i = 0; i < DETAIL; i++) {
+				const angle = (i / DETAIL) * TAU
+				vertices.push(Math.cos(angle) * RADIUS + node.x, Math.sin(angle) * RADIUS + node.y)
+			}
+
+			// generate indices for all triangles
+
+			for (let i = 0; i < DETAIL; i++) {
+				indices.push(off, off + i + 1, off + (i ? i : DETAIL))
+			}
+		}
+
+		this.indices_length = indices.length
+
+		/** @type: Float32Array */
+		const vbo_data = new Float32Array(vertices)
+
+		/** @type: Uint32Array */
+		const ibo_data = new Uint32Array(indices)
+
+		// upload mesh data to GPU
+
+		gl.bindVertexArray(this.vao)
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+		gl.bufferData(gl.ARRAY_BUFFER, vbo_data, gl.STATIC_DRAW)
+
+		gl.enableVertexAttribArray(0)
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ibo_data, gl.STATIC_DRAW)
 	}
 
 	draw() {
 		gl.bindVertexArray(this.vao)
-		gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_BYTE, 0)
+		gl.drawElements(gl.TRIANGLES, this.indices_length, gl.UNSIGNED_INT, 0)
 	}
 }
 
-const node = new Node()
+const nodes = new Nodes(nodeData)
 const node_shader = new Shader("node")
+
+// triangles
+
+class Triangle {
+	/** @function
+	  * @param {Node} a
+	  * @param {Node} b
+	  * @param {Node} c
+	  */
+	constructor(a, b, c) {
+		this.a = a
+		this.b = b
+		this.c = c
+	}
+}
+
+class Triangles {
+	/** @function
+	  * @param {Triangle[]} triangles
+	  */
+	constructor(triangles) {
+		this.triangles = triangles
+
+		this.vao = gl.createVertexArray()
+		gl.bindVertexArray(this.vao)
+
+		this.vbo = gl.createBuffer()
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+
+		gl.enableVertexAttribArray(0)
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+
+		this.ibo = gl.createBuffer()
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+	}
+
+	update_mesh() {
+		// create mesh data
+
+		let vertices = []
+		let indices = []
+
+		function shifted_coord(main_node, other_node_1, other_node_2) {
+			const dx = main_node.x - (other_node_1.x + other_node_2.x) / 2
+			const dy = main_node.y - (other_node_1.y + other_node_2.y) / 2
+
+			const norm = Math.sqrt(dx * dx + dy * dy)
+
+			const nx = dx / norm * -0.01
+			const ny = dy / norm * -0.01
+
+			return [main_node.x + nx, main_node.y + ny]
+		}
+
+		for (const triangle of this.triangles) {
+			const off = vertices.length / 2
+
+			// generate vertices
+
+			vertices.push(...shifted_coord(triangle.a, triangle.b, triangle.c))
+			vertices.push(...shifted_coord(triangle.b, triangle.a, triangle.c))
+			vertices.push(...shifted_coord(triangle.c, triangle.a, triangle.b))
+
+			// generate indices
+
+			indices.push(off, off + 1, off + 2)
+		}
+
+		this.indices_length = indices.length
+
+		/** @type: Float32Array */
+		const vbo_data = new Float32Array(vertices)
+
+		/** @type: Uint32Array */
+		const ibo_data = new Uint32Array(indices)
+
+		// upload mesh data to GPU
+
+		gl.bindVertexArray(this.vao)
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+		gl.bufferData(gl.ARRAY_BUFFER, vbo_data, gl.STATIC_DRAW)
+
+		gl.enableVertexAttribArray(0)
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ibo_data, gl.STATIC_DRAW)
+	}
+
+	draw() {
+		gl.bindVertexArray(this.vao)
+		gl.drawElements(gl.TRIANGLES, this.indices_length, gl.UNSIGNED_INT, 0)
+	}
+}
+
+const triangles = new Triangles([
+	new Triangle(nodes.nodes[0], nodes.nodes[1], nodes.nodes[2]),
+	new Triangle(nodes.nodes[0], nodes.nodes[1], nodes.nodes[3]),
+])
+
+const triangle_shader = new Shader("tri")
 
 // camera controls
 
@@ -135,7 +271,10 @@ function render(now) {
 
 	pos = anim_vec(pos, target_pos, dt * 15)
 
-	// clear screen
+	// clear screen (and other GL state stuff)
+
+	gl.enable(gl.BLEND)
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
 	gl.clearColor(0, 0, 0, 1)
 	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
@@ -155,16 +294,21 @@ function render(now) {
 	const mvp_mat = new Mat(model_mat)
 	mvp_mat.multiply(vp_mat)
 
+	// render triangles
+
+	triangle_shader.use()
+	triangle_shader.mvp(mvp_mat)
+
+	triangles.update_mesh()
+	triangles.draw()
+
 	// render nodes
 
 	node_shader.use()
+	node_shader.mvp(mvp_mat)
 
-	for (const [x, y] of nodeData) {
-		mvp_mat.translate(x, y, 0)
-		node_shader.mvp(mvp_mat)
-		node.draw()
-		mvp_mat.translate(-x, -y, 0)
-	}
+	nodes.update_mesh()
+	nodes.draw()
 
 	// continue render loop
 

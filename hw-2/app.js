@@ -326,6 +326,9 @@ class Mesh {
 	}
 
 	marching_triangle(pt, orig, find_triangle) { //WE ASSUME THAT THE POINT IS RIGHT (COORDINATES)
+		this.lines = new Lines()
+		this.points = new Point()
+
 		let starting_face = 20
 		let q = [this.mesh.faces[starting_face]]
 
@@ -699,20 +702,15 @@ class Geonum {
 			}
 		}, false)
 
-		canvas.addEventListener("click", event => {
-			const shift = event.getModifierState("Shift")
-
-			const world_x = target_mx * Z_OFFSET * zoom - target_px
-			const world_y = -target_my * Z_OFFSET * zoom - target_py
-
-			console.log(world_x, world_y)
-
-		}, false)
-
 		canvas.addEventListener("mousedown", event => {
 			if (event.getModifierState("Shift")) {
 				translating = true
 			}
+
+			const world_x = target_mx * Z_OFFSET * zoom - target_px
+			const world_y = -target_my * Z_OFFSET * zoom - target_py
+
+			this.mesh.marching_triangle([world_x, world_y], undefined, false)
 		})
 
 		canvas.addEventListener("mouseup", () => {

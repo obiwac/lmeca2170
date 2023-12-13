@@ -32,6 +32,27 @@
 				out_colour = vec4(1.0, 0.9, 0.8, 1.0);
 			}
 		</script>
+
+		<!-- triangle shader -->
+
+		<script id="tri-vert" type="x-shader/x-vertex">#version 300 es
+			precision mediump float;
+			layout(location = 0) in vec2 node;
+			uniform mat4 u_mvp;
+
+			void main(void) {
+				gl_Position = u_mvp * vec4(node, 0.0, 1.0);
+			}
+		</script>
+
+		<script id="tri-frag" type="x-shader/x-fragment">#version 300 es
+			precision mediump float;
+			out vec4 out_colour;
+
+			void main(void) {
+				out_colour = vec4(1.0, 0.5, 1.0, 0.5);
+			}
+		</script>
 	</head>
 	<body>
 		<div class="container">
@@ -39,7 +60,7 @@
 
 			<h2>Introduction</h2>
 			<p>
-				This article explains how to find a <strong>Delaunay triangulation</strong> of a set of nodes using Fortune's algorithm!
+				This article explains how to find a <strong>Delaunay triangulation</strong> of a set of nodes using Fortune's algorithm and <strong>Voronoi diagram</strong>!
 				It also includes interactive demonstrations every step of the way - this is what the final result will look like:
 			</p>
 
@@ -48,6 +69,10 @@
 			</div>
 
 			<h2>What is Delaunay triangulation?</h2>
+			<h2>What is a Voronoi diagram?</h2>
+			<h2>What is the relation between Delaunay and Voronoi?</h2>
+			<h2>Fortune's algorithm</h2>
+			<h2>Practical examples</h2>
 			<p>TBD</p>
 		</div>
 	</body>
