@@ -9,6 +9,19 @@ class Node {
 	}
 }
 
+// TODO make this a HalfEdge thingy
+
+class Edge {
+	/** @function
+	  * @param {Node} start
+	  * @param {Node} end
+	  */
+	constructor(start, end) {
+		this.start = start
+		this.end = end
+	}
+}
+
 class Triangle {
 	/** @function
 	  * @param {Node} a

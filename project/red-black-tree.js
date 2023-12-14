@@ -17,7 +17,6 @@ class BeachNode {
 		this.right = null
 
 		this.parent = null
-		this.edge = null
 
 		this.circle_event = null
 		this.is_leaf = true
@@ -41,7 +40,7 @@ class BeachNode {
 		node.parent = this
 	}
 
-	/** @function
+	/** @function set the parent node of the current node to node
 	  * @param {BeachNode} node the parent node
 	  */
 	set_parent(node) {
@@ -64,7 +63,7 @@ class BeachNode {
 
 }
 
-class Edge extends BeachNode {
+class BreakPoint extends BeachNode {
 	constructor(start, left, right) {
 		super(null)
 
@@ -77,6 +76,8 @@ class Edge extends BeachNode {
 		this.is_leaf = true
 
 		this.slope = (left.x - right.x) / (right.y - left.y)
+		console.log("slope: ", this.slope)
+		console.log("start ", start)
 		this.offset = start.y - this.slope * start.x
 		this.direction = new Node(right.y - left.y, left.x - right.x)
 	}
@@ -87,6 +88,10 @@ class BeachTree {
 		this.root = null
 	}
 
+	/** @function return the parent that has node to its left
+	  * @param {Node} node - the node to find the parent of
+	  * @returns {BeachNode} the parent
+	  */
 	get_first_parent_on_left(node) {
 		let current_node = node
 
@@ -97,6 +102,10 @@ class BeachTree {
 		return current_node.parent
 	}
 
+	/** @function return the parent that has node to its right
+	  * @param {Node} node - the node to find the parent of
+	  * @returns {BeachNode} the parent
+	  */
 	get_first_parent_on_right(node) {
 		let current_node = node
 
@@ -108,6 +117,10 @@ class BeachTree {
 	}
 
 	get_first_leaf_on_left(node) {
+		if (node == null) {
+			return null
+		}
+
 		if (node.left == null) {
 			return null
 		}
@@ -122,6 +135,9 @@ class BeachTree {
 	}
 
 	get_first_leaf_on_right(node) {
+		if(node == null) {
+			return null
+		}
 		if (node.right == null) {
 			return null
 		}
@@ -136,7 +152,7 @@ class BeachTree {
 	}
 
 	/** @function
-	 * @returns {number} x - x coordinate of the intersection of the two parabolas
+	  * @returns {number} x - x coordinate of the intersection of the two parabolas
 	  */
 	get_x_of_edge(node, directrix) {
 		const left = this.get_first_leaf_on_left(node)
@@ -144,8 +160,6 @@ class BeachTree {
 
 		const p = left.site
 		const r = right.site
-
-		console.log(left, right)
 
 		let dp = 2 * (p.y - directrix)
 		const a1 = 1 / dp
@@ -173,6 +187,11 @@ class BeachTree {
 			return Math.min(x1, x2)
 		}
 	}
+
+	/** @function
+	  * @param {Node} site - the site to find the arc above
+	  * @returns {BeachNode} the arc above the site
+	  **/
 
 	find_arc_above(site) {
 		let current_node = this.root
