@@ -101,16 +101,15 @@ class Nodes {
 	}
 
 	fortune() {
-		return fortune(this.nodes)
 		const edges = fortune(this.nodes)
 
 		// TODO turn the edges returned by fortune into triangles
 
 		return [
-			new Triangle(nodes[0], nodes[1], nodes[2]),
-			new Triangle(nodes[3], nodes[0], nodes[2]),
-			new Triangle(nodes[4], nodes[2], nodes[1]),
-			new Triangle(nodes[4], nodes[3], nodes[2]),
+			new Triangle(this.nodes[0], this.nodes[1], this.nodes[2]),
+			new Triangle(this.nodes[3], this.nodes[0], this.nodes[2]),
+			new Triangle(this.nodes[4], this.nodes[2], this.nodes[1]),
+			new Triangle(this.nodes[4], this.nodes[3], this.nodes[2]),
 		]
 	}
 }
@@ -158,8 +157,7 @@ class Triangles {
 			return [main_node.x + nx, main_node.y + ny]
 		}
 
-		//TODO AYMERIC FIX THIS ....
-		/*for (const triangle of this.triangles) {
+		for (const triangle of this.triangles) {
 			const off = vertices.length / 2
 
 			// generate vertices
@@ -171,7 +169,7 @@ class Triangles {
 			// generate indices
 
 			indices.push(off, off + 1, off + 2)
-		}*/
+		}
 
 		this.indices_length = indices.length
 
