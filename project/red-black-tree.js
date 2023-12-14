@@ -78,7 +78,7 @@ class Edge extends BeachNode {
 
 		this.slope = (left.x - right.x) / (right.y - left.y)
 		this.offset = start.y - this.slope * start.x
-		this.direction = new Point(right.y - left.y, left.x - right.x)
+		this.direction = new Node(right.y - left.y, left.x - right.x)
 	}
 }
 

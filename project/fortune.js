@@ -57,7 +57,7 @@ function fortune(nodes) {
 			const middle_arc = new BeachNode(current_event[0])
 			const right_arc = new BeachNode(above_arc.site)
 
-			const start_point = new Point(current_event[0], get_y(current_event[0], above_arc.site.x, current_event[0].y))
+			const start_point = new Node(current_event[0], get_y(current_event[0], above_arc.site.x, current_event[0].y))
 
 			const edge_left = new Edge(start_point, above_arc.site, current_event[0])
 			const edge_right = new Edge(start_point, current_event[0], above_arc.site)
