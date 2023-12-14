@@ -20,6 +20,7 @@ const y_res = gl.drawingBufferHeight
 
 gl.viewport(0, 0, x_res, y_res)
 
+
 // nodes
 
 class Nodes {
@@ -106,10 +107,6 @@ class Nodes {
 		// TODO turn the edges returned by fortune into triangles
 
 		return [
-			new Triangle(this.nodes[0], this.nodes[1], this.nodes[2]),
-			new Triangle(this.nodes[3], this.nodes[0], this.nodes[2]),
-			new Triangle(this.nodes[4], this.nodes[2], this.nodes[1]),
-			new Triangle(this.nodes[4], this.nodes[3], this.nodes[2]),
 		]
 	}
 }
@@ -156,7 +153,6 @@ class Triangles {
 
 			return [main_node.x + nx, main_node.y + ny]
 		}
-
 		for (const triangle of this.triangles) {
 			const off = vertices.length / 2
 
@@ -198,6 +194,61 @@ class Triangles {
 		gl.drawElements(gl.TRIANGLES, this.indices_length, gl.UNSIGNED_INT, 0)
 	}
 }
+
+// TODO supprimer ça, juste pour debug et bien visualiser les edges
+class Lines {
+	constructor() {
+		this.vertices = []
+		this.indices = []
+		this.segments = []
+	}
+
+	add_line(x1, y1, x2, y2) {
+		const index = this.vertices.length / 3
+
+		this.vertices.push(x1)
+		this.vertices.push(y1)
+		this.vertices.push(0)
+
+		this.vertices.push(x2)
+		this.vertices.push(y2)
+		this.vertices.push(0)
+
+		this.indices.push(index)
+		this.indices.push(index + 1)
+
+		gl.deleteBuffer(this.vbo)
+		gl.deleteBuffer(this.ibo)
+
+		this.vbo = gl.createBuffer()
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices), gl.STATIC_DRAW)
+
+		this.ibo = gl.createBuffer()
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(this.indices), gl.STATIC_DRAW)
+
+		this.segments.push([x1, y1, x2, y2])
+	}
+
+	draw() {
+		if (this.vertices.length === 0) {
+			return
+		}
+
+		const float_size = this.vertices.BYTES_PER_ELEMENT
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+
+		gl.enableVertexAttribArray(0)
+		gl.vertexAttribPointer(0, 3, gl.FLOAT, gl.FALSE, float_size * 3, float_size * 0)
+
+		gl.drawElements(gl.LINES, this.indices.length, gl.UNSIGNED_INT, 0)
+	}
+}
+
+const lines = new Lines()
 
 const triangles = new Triangles(nodes.fortune())
 const triangle_shader = new Shader("tri")
@@ -299,8 +350,11 @@ function render(now) {
 	nodes.update_mesh()
 	nodes.draw()
 
+	lines.draw()
+
 	// continue render loop
 
 	requestAnimationFrame(render)
 }
+
 requestAnimationFrame(render)

@@ -9,6 +9,14 @@
 * et les noeuds internes sont les edges.
 * https://blog.ivank.net/fortunes-algorithm-and-implementation.html
 */
+
+// Node for cicle events
+class CircleEvent {
+	constructor(site, arc) {
+		this.point = site
+		this.arc = arc
+	}
+}
 class BeachNode {
 	constructor(site) {
 		this.site = site
@@ -18,7 +26,6 @@ class BeachNode {
 
 		this.parent = null
 
-		this.circle_event = null
 		this.is_leaf = true
 	}
 
