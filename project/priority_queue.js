@@ -34,8 +34,8 @@ class PriorityQueue {
 	}
 
 	/**@function
-	 * @param {any} data - the data to enqueue
-	 */
+	  * @param {any} data - the data to enqueue
+	  */
 	enqueue(data) {
 
 		if (this.length == 0) {

@@ -7,6 +7,17 @@ class Node {
 		this.x = x
 		this.y = y
 	}
+
+	/** @function compare two nodes
+	  * @param {Node} other
+	  * @returns {boolean} true if the nodes are equal false otherwise
+	  */
+	compare(other) {
+		if (other == null) {
+			return false
+		}
+		return (this.x == other.x && this.y == other.y)
+	}
 }
 
 // TODO make this a HalfEdge thingy

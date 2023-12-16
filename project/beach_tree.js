@@ -17,6 +17,7 @@ class CircleEvent {
 		this.arc = arc
 	}
 }
+
 class BeachNode {
 	constructor(site) {
 		this.site = site
@@ -27,6 +28,7 @@ class BeachNode {
 		this.parent = null
 
 		this.is_leaf = true
+		this.id = arc_count
 	}
 
 	/** @function set the left child of the current node to node
@@ -35,7 +37,10 @@ class BeachNode {
 	set_left(node) {
 		this.left = node
 		this.is_leaf = false
-		node.parent = this
+
+		if(node != null) {
+			node.parent = this
+		}
 	}
 
 	/** @function set the right child of the current node to node
@@ -44,14 +49,17 @@ class BeachNode {
 	set_right(node) {
 		this.right = node
 		this.is_leaf = false
-		node.parent = this
+
+		if(node != null) {
+			node.parent = this
+		}
 	}
 
 	/** @function set the parent node of the current node to node
 	  * @param {BeachNode} node the parent node
 	  */
 	set_parent(node) {
-		console.log("set parent called with: ", node, " to ", this)
+		//console.log("set parent called with: ", node, " to ", this)
 
 		// Ça arrive quand c'est la première feuille dans l'abre (quand la feuille est la racine)
 		if(node.parent == null ) {
@@ -59,7 +67,7 @@ class BeachNode {
 			return
 		}
 
-		if(node.parent.left == node) {
+		if(node.parent.left.compare(node)) {
 			node.parent.set_left(this)
 		}
 
@@ -68,25 +76,38 @@ class BeachNode {
 		}
 	}
 
+	/** @function compare the current node with other node to see if they are equal
+	  * @param {BeachNode} other - the node to compare with
+	  * @returns {boolean} true if the nodes are equal, false otherwise
+	  */
+	compare(other) {
+		let first_condition = false
+		if(this.site != null) {
+			first_condition = this.site.compare(other.site)
+		} else if (other.site == null) {
+			first_condition = true
+		}
+
+		return ( first_condition && this.id.toString() == other.id.toString())
+	}
+
 }
 
 class BreakPoint extends BeachNode {
-	constructor(start, left, right) {
+	constructor(start, left_site, right_site) {
 		super(null)
 
 		this.start = start
-		this.left = left
-		this.right = right
 
-		this.end = null
-		this.neighbour = null // this is an edge
-		this.is_leaf = true
+		this.slope = (left_site.x - right_site.x) / (right_site.y - left_site.y)
 
-		this.slope = (left.x - right.x) / (right.y - left.y)
-		console.log("slope: ", this.slope)
-		console.log("start ", start)
 		this.offset = start.y - this.slope * start.x
-		this.direction = new Node(right.y - left.y, left.x - right.x)
+		this.direction = new Node(right_site.y - left_site.y, left_site.x - right_site.x)
+	}
+
+	set_id(id_left, id_right) {
+		console.log("set id called with: ", id_left, id_right)
+		this.id = [id_left, id_right]
 	}
 }
 
@@ -102,10 +123,9 @@ class BeachTree {
 	get_first_parent_on_left(node) {
 		let current_node = node
 
-		while (current_node.parent != null && current_node.parent.left == current_node) {
+		while (current_node.parent != null && current_node.parent.left.compare(current_node)) {
 			current_node = current_node.parent
 		}
-
 		return current_node.parent
 	}
 
@@ -116,7 +136,7 @@ class BeachTree {
 	get_first_parent_on_right(node) {
 		let current_node = node
 
-		while (current_node.parent != null && current_node.parent.right == current_node) {
+		while (current_node.parent != null && current_node.parent.right.compare(current_node)) {
 			current_node = current_node.parent
 		}
 
@@ -216,5 +236,14 @@ class BeachTree {
 		}
 
 		return current_node
+	}
+
+	/**@function delete and insert operation. Remove 
+	  * @param {BreakPoint} break_point - the breakpoint to delete
+	  * @param {Node} arc_left - the left arc of the breakpoint
+	  * @param {Node} arc_right - the right arc of the breakpoint
+	  */
+	delete_and_insert_breakpoint(break_point, arc_left, arc_right) {
+
 	}
 }
