@@ -168,7 +168,6 @@ function fortune(nodes) {
 			lines.add_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
 			lines.add_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
 
-
 			new_edge.set_parent(higer_edge)
 			new_edge.set_left(higer_edge.left)
 			new_edge.set_right(higer_edge.right)
