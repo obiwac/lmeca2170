@@ -129,7 +129,9 @@ function fortune(nodes) {
 	beachline = new BeachTree()
 
 	while (queue.length > 0) {
+
 		current_event = queue.dequeue()
+
 		if (current_event[1] === events.site) {
 			if (beachline.root == null) {
 				beachline.root = new BeachNode(current_event[0])
@@ -176,6 +178,8 @@ function fortune(nodes) {
 			search_for_circle_event(left_arc, beachline, queue)
 			search_for_circle_event(right_arc, beachline, queue)
 			arc_count++; // Only once for the "new" arc other arcs arent new they are just split
+
+			//beachline.balance(edge_left)
 		}
 
 		else if (current_event[1] === events.circle) {
@@ -183,6 +187,7 @@ function fortune(nodes) {
 			if(current_event[0].is_valid == false) {
 				continue
 			}
+
 
 			let current_arc = current_event[0].arc
 
@@ -258,6 +263,8 @@ function fortune(nodes) {
 
 			search_for_circle_event(left_arc, beachline, queue)
 			search_for_circle_event(right_arc, beachline, queue)
+
+			//beachline.balance(new_edge)
 		}
 	}
 
