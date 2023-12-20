@@ -9,7 +9,7 @@ class PriorityQueue {
 		let right = null
 		let higher_node = null
 
-		const half_size = Math.floor(this.length)
+		const half_size = Math.floor(this.length / 2)
 		const our_node = this.lazy_tree[index]
 
 		while (index < half_size) {
@@ -44,7 +44,7 @@ class PriorityQueue {
 		this.length++
 
 		while (current_index > 0) {
-			const parent_index = Math.floor(current_index - 1)
+			const parent_index = Math.floor((current_index - 1) / 2)
 			const temp = this.lazy_tree[parent_index]
 
 			if (data[0].y <= temp[0].y) {

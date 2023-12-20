@@ -95,7 +95,7 @@ class BeachNode {
 			return false
 		}
 
-		const first_condition = false
+		let first_condition = false
 
 		if (this.site != null) {
 			first_condition = this.site.compare(other.site)
