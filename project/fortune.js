@@ -7,11 +7,8 @@ let arc_count = 0
 let circle_count = 0
 let BOUNDING_WIDTH = 100
 let BOUNDING_HEIGHT = 10
-let epsilon = 1e-9
-let repeated_event_to_delete = {}
 
 function get_y(p, x, directrix) {
-
 	const dp = 2 * (p.y - directrix)
 	const a1 = 1 / dp
 	const b1 = -2 * p.x / dp
@@ -44,7 +41,7 @@ function edge_intersection(edge1, edge2) {
 		return null
 	}
 
-	if((u <= epsilon) && (v <= epsilon) ){
+	if((u <= Number.EPSILON) && (v <= Number.EPSILON) ){
 		return null
 	}
 
