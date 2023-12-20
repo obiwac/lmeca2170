@@ -1,3 +1,5 @@
+// TODO DON'T MAKE THIS GLOBAL STATE
+
 const events = {
 	"site": 0,
 	"circle": 1,
@@ -7,6 +9,9 @@ let arc_count = 0
 let circle_count = 0
 let BOUNDING_WIDTH = 100
 let BOUNDING_HEIGHT = 10
+
+/** @type: Line[] */
+let TODO_voronoi_lines = []
 
 function get_y(p, x, directrix) {
 	const dp = 2 * (p.y - directrix)
@@ -24,44 +29,43 @@ function get_y(p, x, directrix) {
  * @returns {Node} - The intersection of the two edges
  */
 function edge_intersection(edge1, edge2) {
+	const dx = edge2.start.x - edge1.start.x
+	const dy = edge2.start.y - edge1.start.y
 
-	let dx = edge2.start.x - edge1.start.x
-	let dy = edge2.start.y - edge1.start.y
+	const det = ((edge2.direction.x * edge1.direction.y) - (edge2.direction.y * edge1.direction.x))
 
-	let det =  ((edge2.direction.x* edge1.direction.y) - (edge2.direction.y* edge1.direction.x))
-
-	if(det == 0) {
-		return null;
-	}
-
-	let u = (dy*edge2.direction.x - dx*edge2.direction.y)/det
-	let v = (dy*edge1.direction.x - dx*edge1.direction.y)/det
-
-	if(u < 0.0 || v < 0.0) {
+	if (det == 0) {
 		return null
 	}
 
-	if((u <= Number.EPSILON) && (v <= Number.EPSILON) ){
+	const u = (dy * edge2.direction.x - dx * edge2.direction.y) / det
+	const v = (dy * edge1.direction.x - dx * edge1.direction.y) / det
+
+	if (u < 0.0 || v < 0.0) {
+		return null
+	}
+
+	if (u <= Number.EPSILON && v <= Number.EPSILON) {
 		return null
 	}
 
 	// Only keep to 8 decimal places to avoid "floating point errors" like 0.020000000000000004 > 0.02
+
 	return new Node(parseFloat((edge1.start.x + edge1.direction.x*u).toPrecision(8)) ,parseFloat((edge1.start.y + edge1.direction.y*u).toPrecision(8)))
 }
 
 /** @function
- * @param {BeachNode} arc - The arc to check for circle event
- */
-function search_for_circle_event(arc, beachline, queue, c=false) {
-
+  * @param {BeachNode} arc - The arc to check for circle event
+  */
+function search_for_circle_event(arc, beachline, queue) {
 	edge_left = beachline.get_first_parent_on_left(arc)
 	edge_right = beachline.get_first_parent_on_right(arc)
 
-	if(edge_left == null || edge_right == null ) {
+	if (edge_left == null || edge_right == null ) {
 		return null
 	}
 
-	let intersection = edge_intersection(edge_left, edge_right)
+	const intersection = edge_intersection(edge_left, edge_right)
 
 	if (intersection == null || intersection == false) {
 		return
@@ -73,52 +77,63 @@ function search_for_circle_event(arc, beachline, queue, c=false) {
 	centre_offset_x = parseFloat(centre_offset_x).toPrecision(12)
 	centre_offset_y = parseFloat(centre_offset_y).toPrecision(12)
 
-	let dist = Math.sqrt((centre_offset_x * centre_offset_x) + (centre_offset_y * centre_offset_y))
-	let intersection_y = intersection.y - dist
+	const dist = Math.sqrt(centre_offset_x * centre_offset_x + centre_offset_y * centre_offset_y)
+	const intersection_y = intersection.y - dist
 
 	if (intersection_y  >= arc.site.y) {
 		return null
 	}
 
-	let circle_event = new CircleEvent(intersection, arc, intersection_y, circle_count)
+	const circle_event = new CircleEvent(intersection, arc, intersection_y, circle_count)
 	arc.circle_event = circle_event
 
 	queue.enqueue([circle_event, events.circle])
 	circle_count += 1
 }
 
-function draw_remaining_edge(current_node) {
+/** @function
+  * @param {number} x1
+  * @param {number} y1
+  * @param {number} x2
+  * @param {number} y2
+  */
+function add_line(x1, y1, x2, y2) {
+	TODO_voronoi_lines.push(new Line(x1, y1, x2, y2))
+}
 
+function add_remaining_line(current_node) {
 	if (current_node.is_leaf) {
 		return
 	}
 
 	if (current_node.left != null) {
-		draw_remaining_edge(current_node.left)
+		add_remaining_line(current_node.left)
 	}
 
 	if (current_node.right != null) {
-		draw_remaining_edge(current_node.right)
+		add_remaining_line(current_node.right)
 	}
 
 	let max_x_coord = null
+
 	if (current_node.direction.x > 0) {
 		max_x_coord = Math.max(current_node.start.x + BOUNDING_WIDTH, BOUNDING_WIDTH)
-	} else {
+	}
+
+	else {
 		max_x_coord = Math.min(current_node.start.x - BOUNDING_WIDTH, 0)
 	}
 
-	lines.add_line(current_node.start.x, current_node.start.y, max_x_coord, max_x_coord * current_node.slope + current_node.offset)
+	add_line(current_node.start.x, current_node.start.y, max_x_coord, max_x_coord * current_node.slope + current_node.offset)
 }
 
 /** @function
   * @param {Node[]} nodes
   * @returns {Edge[]}
   */
-
 function fortune(nodes) {
-
 	queue = new PriorityQueue()
+
 	for (const node of nodes) {
 		queue.enqueue([node, events.site])
 	}
@@ -126,13 +141,13 @@ function fortune(nodes) {
 	beachline = new BeachTree()
 
 	while (queue.length > 0) {
-
 		current_event = queue.dequeue()
 
 		if (current_event[1] === events.site) {
 			if (beachline.root == null) {
 				beachline.root = new BeachNode(current_event[0])
-				arc_count++;
+				arc_count++
+
 				continue
 			}
 
@@ -148,7 +163,7 @@ function fortune(nodes) {
 			const middle_arc = new BeachNode(current_event[0])
 			const right_arc = new BeachNode(above_arc.site)
 
-			// same id beacause they are the same parabola
+			// same id because they are the same parabola
 
 			left_arc.id = above_arc.id
 			right_arc.id = above_arc.id
@@ -174,17 +189,13 @@ function fortune(nodes) {
 
 			search_for_circle_event(left_arc, beachline, queue)
 			search_for_circle_event(right_arc, beachline, queue)
-			arc_count++; // Only once for the "new" arc other arcs arent new they are just split
-
-			//beachline.balance(edge_left)
+			arc_count++ // Only once for the "new" arc other arcs aren't new they are just split
 		}
 
 		else if (current_event[1] === events.circle) {
-
-			if(current_event[0].is_valid == false) {
+			if (current_event[0].is_valid == false) {
 				continue
 			}
-
 
 			let current_arc = current_event[0].arc
 
@@ -233,22 +244,25 @@ function fortune(nodes) {
 			new_edge.set_id(left_arc.id, right_arc.id)
 
 			// Create our "complete edges" (here it is lines for debugging)
-			// lines.add_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
-			// lines.add_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
+			add_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
+			add_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
 
 			new_edge.set_parent(higher_edge)
 			new_edge.set_left(higher_edge.left)
 			new_edge.set_right(higher_edge.right)
 
 			// Reorganize the tree
-			let remaining_edge = null
+			let remaining_line = null
+
 			if (current_arc.parent.left.compare(current_arc)){
-				remaining_edge = current_arc.parent.right
-			} else {
-				remaining_edge = current_arc.parent.left
+				remaining_line = current_arc.parent.right
 			}
 
-			remaining_edge.set_parent(current_arc.parent)
+			else {
+				remaining_line = current_arc.parent.left
+			}
+
+			remaining_line.set_parent(current_arc.parent)
 
 			if (beachline.root.compare(left_edge) || beachline.root.compare(right_edge)) {
 				beachline.root = new_edge
@@ -260,14 +274,14 @@ function fortune(nodes) {
 
 			search_for_circle_event(left_arc, beachline, queue)
 			search_for_circle_event(right_arc, beachline, queue)
-
-			//beachline.balance(new_edge)
 		}
 	}
 
 	// Traverse the tree to get the remaining "unfinished" edges
-	draw_remaining_edge(beachline.root)
-	return [
-		new Edge(nodes[0], nodes[1]),
-	]
+	add_remaining_line(beachline.root)
+
+	return {
+		TODO_voronoi_lines: TODO_voronoi_lines,
+		edges: [],
+	}
 }
