@@ -281,7 +281,7 @@ function fortune(nodes) {
 	add_remaining_line(beachline.root)
 
 	return {
-		TODO_voronoi_lines: TODO_voronoi_lines,
+		voronoi_lines: TODO_voronoi_lines,
 		edges: [],
 	}
 }

@@ -131,6 +131,7 @@ class Triangles {
 
 			return [main_node.x + nx, main_node.y + ny]
 		}
+
 		for (const triangle of this.triangles) {
 			const off = vertices.length / 2
 

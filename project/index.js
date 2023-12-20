@@ -22,26 +22,31 @@ gl.viewport(0, 0, x_res, y_res)
 
 // nodes
 
+/*
 let random_nodes = []
-const scale = 1
+const scale = 10
 
-for (let i = 0; i < 10; i++) {
-	random_nodes.push([scale * Math.random(), scale * Math.random()])
+for (let i = 0; i < 10000; i++) {
+	random_nodes.push([scale * (Math.random() - .5), scale * (Math.random() - .5)])
 }
 
 const nodes = new Nodes(random_nodes)
-// const nodes = new Nodes(nodeData)
+*/
+
+const nodes = new Nodes(nodeData)
 const node_shader = new Shader("node")
 const {voronoi_lines: voronoi_lines_raw, delaunay_triangles} = nodes.fortune()
 
 // voronoi lines
 
-// const voronoi_lines = new Lines(voronoi_lines_raw)
+const voronoi_lines = new Lines(voronoi_lines_raw)
+voronoi_lines.update_mesh()
 
 // triangles
 
 const triangles = new Triangles(delaunay_triangles)
 const triangle_shader = new Shader("tri")
+triangles.update_mesh()
 
 // camera controls
 
@@ -129,7 +134,6 @@ function render(now) {
 	triangle_shader.use()
 	triangle_shader.mvp(mvp_mat)
 
-	triangles.update_mesh()
 	triangles.draw()
 
 	// render nodes
@@ -137,12 +141,11 @@ function render(now) {
 	node_shader.use()
 	node_shader.mvp(mvp_mat)
 
-	nodes.update_mesh()
 	nodes.draw()
 
 	// render voronoi lines
 
-	// voronoi_lines.render()
+	voronoi_lines.draw()
 
 	// continue render loop
 
