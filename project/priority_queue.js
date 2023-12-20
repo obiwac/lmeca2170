@@ -18,15 +18,16 @@ class PriorityQueue {
 		let right   		= null
 		let higher_node 	= null
 		let half_size 		= this.length >>> 1 // tricks to avoid Math.floor
+		let size 			= this.length
 
 		let our_node = this.lazy_tree[index]
 
 		while (index < half_size) {
-			left = index * 2 + 1
-			right = index * 2 + 2
+			left = (index * 2) + 1
+			right = (index * 2) + 2
 
 			higher_node = this.lazy_tree[left]
-			if (right < this.length && this.lazy_tree[right][0].y > higher_node[0].y) {
+			if (right < size && this.lazy_tree[right][0].y > higher_node[0].y) {
 				left = right
 				higher_node = this.lazy_tree[right]
 			}
@@ -47,12 +48,6 @@ class PriorityQueue {
 	  * @param {any} data - the data to enqueue
 	  */
 	enqueue(data) {
-
-		if (this.length == 0) {
-			this.lazy_tree.push(data)
-			this.length++
-			return
-		}
 
 		let current_index = this.length
 		this.lazy_tree.push(data)
@@ -77,19 +72,18 @@ class PriorityQueue {
 		*/
 	dequeue() {
 
-		if (this.length == 0) {
+		if (this.length <= 0) {
 			return null
 		}
 
 		let res = this.lazy_tree[0]
 
 		if (this.length > 1) {
-			this.lazy_tree[0] = this.lazy_tree[this.length - 1]
-			this.length--
+			this.lazy_tree[0] = this.lazy_tree[--this.length]
 			this.heapify(0)
 
 		} else {
-			this.length--
+			this.length -= 1
 		}
 
 		return res
