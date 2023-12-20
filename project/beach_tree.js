@@ -1,10 +1,8 @@
-/*
-* AVL Beach Tree implementation. Internal nodes are BreakPoints and leaves are Arcs
-* see: https://www.programiz.com/dsa/avl-tree
-* see: https://blog.ivank.net/fortunes-algorithm-and-implementation.html
-*/
+// AVL Beach Tree implementation
+// internal nodes are BreakPoint's and leaves are Arc's
+// see: https://www.programiz.com/dsa/avl-tree
+// see: https://blog.ivank.net/fortunes-algorithm-and-implementation.html
 
-// Node for cicle events
 class CircleEvent {
 	constructor(site, arc, y, radius, id) {
 		this.point = site
@@ -51,7 +49,7 @@ class BeachNode {
 		this.left = node
 		this.is_leaf = false
 
-		if(node != null) {
+		if (node != null) {
 			node.parent = this
 		}
 	}
@@ -63,7 +61,7 @@ class BeachNode {
 		this.right = node
 		this.is_leaf = false
 
-		if(node != null) {
+		if (node != null) {
 			node.parent = this
 		}
 	}
@@ -72,14 +70,14 @@ class BeachNode {
 	  * @param {BeachNode} node the parent node
 	  */
 	set_parent(node) {
+		if (node.parent == null) {
+			// can happen if node is the root of the tree
 
-		// Ça arrive quand c'est la première feuille dans l'abre (quand la feuille est la racine)
-		if(node.parent == null ) {
 			this.parent = null
 			return
 		}
 
-		if(node.parent.left.compare(node)) {
+		if (node.parent.left.compare(node)) {
 			node.parent.set_left(this)
 		}
 
@@ -97,15 +95,17 @@ class BeachNode {
 			return false
 		}
 
-		let first_condition = false
+		const first_condition = false
 
-		if(this.site != null) {
+		if (this.site != null) {
 			first_condition = this.site.compare(other.site)
-		} else if (other.site == null) {
+		}
+
+		else if (other.site == null) {
 			first_condition = true
 		}
 
-		return ( first_condition && this.id.toString() == other.id.toString())
+		return first_condition && this.id.toString() == other.id.toString()
 	}
 
 	/** @function update the height of the node for AVL
@@ -121,9 +121,9 @@ class BeachNode {
 		if (this.right != null) {
 			right_height = this.right.height
 		}
-		node.height = Math.max(left_height, right_height) + 1;
-	  }
 
+		node.height = Math.max(left_height, right_height) + 1
+	}
 }
 
 class BreakPoint extends BeachNode {
@@ -131,7 +131,6 @@ class BreakPoint extends BeachNode {
 		super(null)
 
 		this.start = start
-
 		this.slope = (left_site.x - right_site.x) / (right_site.y - left_site.y)
 
 		this.offset = start.y - this.slope * start.x
@@ -158,6 +157,7 @@ class BeachTree {
 		while (current_node.parent != null && current_node.parent.left.compare(current_node)) {
 			current_node = current_node.parent
 		}
+
 		return current_node.parent
 	}
 
@@ -194,7 +194,7 @@ class BeachTree {
 	}
 
 	get_first_leaf_on_right(node) {
-		if(node == null) {
+		if (node == null) {
 			return null
 		}
 
@@ -206,124 +206,6 @@ class BeachTree {
 
 		while (current_node.is_leaf == false) {
 			current_node = current_node.left
-		}
-
-		return current_node
-	}
-
-	/** @function rotate the tree to the left around node
-	 * @param {Node} node - the new root of the tree
-	 */
-	rotate_left(node) {
-		let y = node.right
-		let T2 = y.left
-
-		// Watchout it is not a normal AVL rotation left because our tree is a bit special so we need to play with parent
-
-		y.set_parent(node)
-		y.left = node
-		node.right = T2
-
-		node.update_height()
-		y.update_height()
-
-		return y // new root
-	}
-
-	/** @function rotate the tree to the right around node
-	 * @param {Node} node - the new root of the tree
-	 */
-	rotate_right(node) {
-		let y = node.left
-		let T3 = y.right
-
-		// Watchout it is not a normal AVL rotation right because our tree is a bit special so we need to play with parent
-
-		y.set_parent(node)
-		y.right = node
-		node.left = T3
-
-		node.update_height()
-		y.update_height()
-
-		return y // new root
-	}
-
-	/** @function return the balance factor at node
-	 * @param {Node} node - the node to get the balance factor of
-	 * @returns {Int} the balance factor
-	 */
-	get_balance_factor(node) {
-		if (node == null) {
-			return 0
-		}
-
-		let left_height = 0
-		let right_height = 0
-
-		if(node.left != null) {
-			left_height = node.left.height
-		}
-
-		if (node.right != null) {
-			right_height = node.right.height
-		}
-
-		return left_height - right_height
-	}
-
-	/** @function balance the subtree at node
-	  * @param {Node} node - the node to balance around
-	  * @returns {Node} the new root of the subtree
-	  */
-	balance_subtree(node) {
-
-		let root_balance_factor = this.get_balance_factor(node)
-		if (node.left == null || node.right == null) {
-			console.log("wesh y'a un pb")
-			return node
-		}
-
-		console.log("root_balance_factor", root_balance_factor)
-
-		let left_balance_factor = this.get_balance_factor(node.left)
-		let right_balance_factor = this.get_balance_factor(node.right)
-
-		if (root_balance_factor > 1 && left_balance_factor >= 0) {
-			console.log("rotate right")
-			return this.rotate_right(node)
-		}
-
-		if (root_balance_factor < -1 && right_balance_factor <= 0) {
-			console.log("rotate left")
-			return this.rotate_left(node)
-		}
-
-		if (root_balance_factor > 1 && left_balance_factor < 0) {
-			console.log("rotate left and right")
-			node.left = this.rotate_left(node.left)
-			return this.rotate_right(node)
-		}
-
-		if (root_balance_factor < -1 && right_balance_factor > 0) {
-			console.log("rotate right and left")
-			node.right = this.rotate_right(node.right)
-			return this.rotate_left(node)
-		}
-
-		return node
-	}
-
-	/** @function balance the tree around and balance abouve nodes
-	 *  @param {Node} node - the node to balance around
-	 * @returns {Node} the new root of the tree
-	 */
-	balance(node) {
-		let current_node = node
-
-		while (current_node != null) {
-			current_node = this.balance_subtree(current_node)
-			current_node = current_node.parent
 		}
 
 		return current_node
@@ -369,8 +251,7 @@ class BeachTree {
 	/** @function
 	  * @param {Node} site - the site to find the arc above
 	  * @returns {BeachNode} the arc above the site
-	  **/
-
+	  */
 	find_arc_above(site) {
 		let current_node = this.root
 
