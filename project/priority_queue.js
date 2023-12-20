@@ -1,11 +1,3 @@
-class QueueNode {
-	constructor(data) {
-		this.data = data;
-		this.next = null;
-		this.prev = null;
-	}
-}
-
 class PriorityQueue {
 	constructor() {
 		this.lazy_tree = []
@@ -79,7 +71,8 @@ class PriorityQueue {
 		let res = this.lazy_tree[0]
 
 		if (this.length > 1) {
-			this.lazy_tree[0] = this.lazy_tree[--this.length]
+			this.length -= 1
+			this.lazy_tree[0] = this.lazy_tree[this.length]
 			this.heapify(0)
 
 		} else {
