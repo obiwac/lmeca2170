@@ -173,3 +173,63 @@ class Triangles {
 		gl.drawElements(gl.TRIANGLES, this.indices_length, gl.UNSIGNED_INT, 0)
 	}
 }
+
+class Lines {
+	/** @function
+	  * @param {Line[]} lines
+	  */
+	constructor(lines) {
+		this.lines = lines
+
+		this.vao = gl.createVertexArray()
+		gl.bindVertexArray(this.vao)
+
+		this.vbo = gl.createBuffer()
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+
+		gl.enableVertexAttribArray(0)
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+
+		this.ibo = gl.createBuffer()
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+	}
+
+	update_mesh() {
+		// create mesh data
+
+		let vertices = []
+		let indices = []
+
+		for (const line of this.lines) {
+			const off = vertices.length / 2
+			vertices.push(line.x1, line.y1, line.x2, line.y2)
+			indices.push(off, off + 1)
+		}
+
+		this.indices_length = indices.length
+
+		/** @type: Float32Array */
+		const vbo_data = new Float32Array(vertices)
+
+		/** @type: Uint32Array */
+		const ibo_data = new Uint32Array(indices)
+
+		// upload mesh data to GPU
+
+		gl.bindVertexArray(this.vao)
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
+		gl.bufferData(gl.ARRAY_BUFFER, vbo_data, gl.STATIC_DRAW)
+
+		gl.enableVertexAttribArray(0)
+		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+
+		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ibo_data, gl.STATIC_DRAW)
+	}
+
+	draw() {
+		gl.bindVertexArray(this.vao)
+		gl.drawElements(gl.LINES, this.indices_length, gl.UNSIGNED_INT, 0)
+	}
+}
