@@ -210,21 +210,21 @@ function fortune(nodes) {
 				continue
 			}
 
-			let higer_edge = null
+			let higher_edge = null
 			let current_node = current_arc
 
 			while (current_node.parent != null) {
 				current_node = current_node.parent
 				if (current_node.compare(left_edge)) {
-					higer_edge = left_edge
+					higher_edge = left_edge
 				}
 
 				if (current_node.compare(right_edge)) {
-					higer_edge = right_edge
+					higher_edge = right_edge
 				}
 			}
 
-			if (higer_edge == null) {
+			if (higher_edge == null) {
 				continue
 			}
 
@@ -233,12 +233,12 @@ function fortune(nodes) {
 			new_edge.set_id(left_arc.id, right_arc.id)
 
 			// Create our "complete edges" (here it is lines for debugging)
-			lines.add_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
-			lines.add_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
+			// lines.add_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
+			// lines.add_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
 
-			new_edge.set_parent(higer_edge)
-			new_edge.set_left(higer_edge.left)
-			new_edge.set_right(higer_edge.right)
+			new_edge.set_parent(higher_edge)
+			new_edge.set_left(higher_edge.left)
+			new_edge.set_right(higher_edge.right)
 
 			// Reorganize the tree
 			let remaining_edge = null
