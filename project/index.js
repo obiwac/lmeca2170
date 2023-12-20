@@ -102,7 +102,12 @@ class Nodes {
 	}
 
 	fortune() {
+		var startTime = performance.now()
+
 		const edges = fortune(this.nodes)
+
+		var endTime = performance.now()
+		console.log(`Call to fortune took ${endTime - startTime} milliseconds`)
 
 		// TODO turn the edges returned by fortune into triangles
 

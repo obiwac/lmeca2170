@@ -12,11 +12,28 @@
 
 // Node for cicle events
 class CircleEvent {
-	constructor(site, arc) {
+	constructor(site, arc, y, radius, id) {
 		this.point = site
+		this.y = y
 		this.arc = arc
+		this.radius = radius
+		this.id = id
+		this.valid = true
+	}
+
+	/** @function compare the circle event with other circle to see if they are equal
+	  * @param {CircleEvent} other - the circle event to compare with
+	  * @returns {boolean} true if the nodes are equal, false otherwise
+	  */
+	compare(other) {
+		if (other == null) {
+			return false
+		}
+
+		return this.id == other.id
 	}
 }
+
 
 class BeachNode {
 	constructor(site) {
@@ -26,6 +43,7 @@ class BeachNode {
 		this.right = null
 
 		this.parent = null
+		this.circle_event = null
 
 		this.is_leaf = true
 		this.id = arc_count
@@ -59,7 +77,6 @@ class BeachNode {
 	  * @param {BeachNode} node the parent node
 	  */
 	set_parent(node) {
-		//console.log("set parent called with: ", node, " to ", this)
 
 		// Ça arrive quand c'est la première feuille dans l'abre (quand la feuille est la racine)
 		if(node.parent == null ) {
@@ -81,7 +98,12 @@ class BeachNode {
 	  * @returns {boolean} true if the nodes are equal, false otherwise
 	  */
 	compare(other) {
+		if (other == null) {
+			return false
+		}
+
 		let first_condition = false
+
 		if(this.site != null) {
 			first_condition = this.site.compare(other.site)
 		} else if (other.site == null) {
@@ -103,11 +125,6 @@ class BreakPoint extends BeachNode {
 
 		this.offset = start.y - this.slope * start.x
 		this.direction = new Node(right_site.y - left_site.y, left_site.x - right_site.x)
-	}
-
-	set_id(id_left, id_right) {
-		console.log("set id called with: ", id_left, id_right)
-		this.id = [id_left, id_right]
 	}
 }
 
@@ -165,6 +182,7 @@ class BeachTree {
 		if(node == null) {
 			return null
 		}
+
 		if (node.right == null) {
 			return null
 		}
@@ -236,14 +254,5 @@ class BeachTree {
 		}
 
 		return current_node
-	}
-
-	/**@function delete and insert operation. Remove 
-	  * @param {BreakPoint} break_point - the breakpoint to delete
-	  * @param {Node} arc_left - the left arc of the breakpoint
-	  * @param {Node} arc_right - the right arc of the breakpoint
-	  */
-	delete_and_insert_breakpoint(break_point, arc_left, arc_right) {
-
 	}
 }

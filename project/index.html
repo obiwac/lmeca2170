@@ -6,14 +6,6 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="style.css">
 
-		<script src="nodes_coarse.txt"></script> <!-- XXX no clue why this was given to us with a .txt extension -->
-		<script src="matrix.js"></script>
-		<script src="shader.js"></script>
-		<script src="primitives.js"></script>
-		<script src="index.js" defer></script> <!-- defer to execute after the window has been loaded -->
-		<script src="beach_tree.js"></script>
-		<script src="fortune.js"></script>
-		<script src="priority_queue.js"></script>
 
 		<!-- node shader -->
 
@@ -71,6 +63,7 @@
 			<div class="canvas-container">
 				<canvas id="canvas" width="800" height="480"></canvas>
 			</div>
+			<button id="next_fortune">Next</button>
 
 			<h2>What is Delaunay triangulation?</h2>
 			<h2>What is a Voronoi diagram?</h2>
@@ -80,4 +73,12 @@
 			<p>TBD</p>
 		</div>
 	</body>
+	<script src="nodes_coarse.txt"></script> <!-- XXX no clue why this was given to us with a .txt extension -->
+	<script src="matrix.js"></script>
+	<script src="shader.js"></script>
+	<script src="primitives.js"></script>
+	<script src="index.js" defer></script> <!-- defer to execute after the window has been loaded -->
+	<script src="beach_tree.js"></script>
+	<script src="fortune.js"></script>
+	<script src="priority_queue.js"></script>
 </html>

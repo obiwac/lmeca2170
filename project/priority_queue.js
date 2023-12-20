@@ -13,24 +13,34 @@ class PriorityQueue {
 	}
 
 	heapify(index) {
-		let largest = index
-		let left = index * 2 + 1
-		let right = index * 2 + 2
 
-		// on recherche le plus grand
-		
-		if (left < this.length && this.lazy_tree[left][0].y > this.lazy_tree[largest][0].y) {
-			largest = left
-		} else if (right < this.length && this.lazy_tree[right][0].y > this.lazy_tree[largest][0].y) {
-			largest = right
-		}
+		let left    		= null
+		let right   		= null
+		let higher_node 	= null
+		let half_size 		= this.length >>> 1 // tricks to avoid Math.floor
 
-		if (largest != index) { // Si on a trouvé un plus grand alors on swap
-			let temp = this.lazy_tree[index]
-			this.lazy_tree[index] = this.lazy_tree[largest]
-			this.lazy_tree[largest] = temp
-			this.heapify(largest)
+		let our_node = this.lazy_tree[index]
+
+		while (index < half_size) {
+			left = index * 2 + 1
+			right = index * 2 + 2
+
+			higher_node = this.lazy_tree[left]
+			if (right < this.length && this.lazy_tree[right][0].y > higher_node[0].y) {
+				left = right
+				higher_node = this.lazy_tree[right]
+			}
+
+			if (! (higher_node[0].y > our_node[0].y)) {
+				break
+			}
+
+			this.lazy_tree[index] = higher_node
+			index = left
 		}
+		this.lazy_tree[index] = our_node
+		return
+
 	}
 
 	/**@function
@@ -44,14 +54,22 @@ class PriorityQueue {
 			return
 		}
 
+		let current_index = this.length
 		this.lazy_tree.push(data)
-
 		this.length++
 
-		for (let i = Math.floor(this.length / 2) - 1; i >= 0; i--) {
-			this.heapify(i)
-		}
+		while (current_index > 0) {
 
+			let parent_index = (current_index - 1) >> 1 // tricks to avoid Math.floor
+			let temp = this.lazy_tree[parent_index]
+
+			if (! (data[0].y > temp[0].y)) {
+				break
+			}
+			this.lazy_tree[current_index] = temp
+			current_index = parent_index
+		}
+		this.lazy_tree[current_index] = data
 	}
 
 	/**@function
@@ -63,18 +81,17 @@ class PriorityQueue {
 			return null
 		}
 
-		//swap O and last element of the array
-		let temp = this.lazy_tree[0]
-		this.lazy_tree[0] = this.lazy_tree[this.length - 1]
-		this.lazy_tree[this.length - 1] = temp
-		
-		const data = this.lazy_tree.pop()
+		let res = this.lazy_tree[0]
 
-		this.length--
+		if (this.length > 1) {
+			this.lazy_tree[0] = this.lazy_tree[this.length - 1]
+			this.length--
+			this.heapify(0)
 
-		for (let i = Math.floor(this.length / 2) - 1; i >= 0; i--) {
-			this.heapify(i)
+		} else {
+			this.length--
 		}
-		return data
+
+		return res
 	}
 }
