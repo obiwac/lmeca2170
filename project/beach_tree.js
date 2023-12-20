@@ -126,6 +126,10 @@ class BreakPoint extends BeachNode {
 		this.offset = start.y - this.slope * start.x
 		this.direction = new Node(right_site.y - left_site.y, left_site.x - right_site.x)
 	}
+
+	set_id(id_left, id_right) {
+		this.id = [id_left, id_right]
+	}
 }
 
 class BeachTree {
