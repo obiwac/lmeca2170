@@ -34,6 +34,8 @@ const nodes = new Nodes(random_nodes)
 */
 
 const nodes = new Nodes(nodeData)
+nodes.update_mesh()
+
 const node_shader = new Shader("node")
 const {voronoi_lines: voronoi_lines_raw, delaunay_triangles} = nodes.fortune()
 
