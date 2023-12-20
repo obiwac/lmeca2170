@@ -27,7 +27,7 @@ class CircleEvent {
 }
 
 class BeachNode {
-	constructor(site) {
+	constructor(site, id) {
 		this.site = site
 
 		this.left = null
@@ -37,7 +37,7 @@ class BeachNode {
 		this.circle_event = null
 
 		this.is_leaf = true
-		this.id = arc_count
+		this.id = id
 
 		this.height = 1
 	}
@@ -128,7 +128,7 @@ class BeachNode {
 
 class BreakPoint extends BeachNode {
 	constructor(start, left_site, right_site) {
-		super(null)
+		super(null, null)
 
 		this.start = start
 		this.slope = (left_site.x - right_site.x) / (right_site.y - left_site.y)
