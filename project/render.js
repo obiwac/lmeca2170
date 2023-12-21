@@ -118,13 +118,18 @@ class Triangles {
 		let indices = []
 
 		function shifted_coord(main_node, other_node_1, other_node_2) {
-			const dx = main_node.x - (other_node_1.x + other_node_2.x) / 2
-			const dy = main_node.y - (other_node_1.y + other_node_2.y) / 2
+			const dx_1 = main_node.x - other_node_1.x
+			const dy_1 = main_node.y - other_node_1.y
 
-			const norm = Math.sqrt(dx * dx + dy * dy)
+			const norm_1 = Math.sqrt(dx_1 * dx_1 + dy_1 * dy_1)
 
-			const nx = dx / norm * -0.01
-			const ny = dy / norm * -0.01
+			const dx_2 = main_node.x - other_node_2.x
+			const dy_2 = main_node.y - other_node_2.y
+
+			const norm_2 = Math.sqrt(dx_2 * dx_2 + dy_2 * dy_2)
+
+			const nx = (dx_1 / norm_1 + dx_2 / norm_2) / 2 * -0.01
+			const ny = (dy_1 / norm_1 + dy_2 / norm_2) / 2 * -0.01
 
 			return [main_node.x + nx, main_node.y + ny]
 		}
