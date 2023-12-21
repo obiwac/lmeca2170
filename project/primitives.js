@@ -2,10 +2,14 @@ class Node {
 	/** @function
 	  * @param {number} x
 	  * @param {number} y
+	  * @param {number} i
 	  */
-	constructor(x, y) {
+	constructor(x, y, i = -1) {
 		this.x = x
 		this.y = y
+
+		this.i = i
+		this.incident = []
 	}
 
 	/** @function compare two nodes

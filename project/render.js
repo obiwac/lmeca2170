@@ -5,7 +5,7 @@ class Nodes {
 		this.nodes = []
 
 		for (const [x, y] of nodeData) {
-			this.nodes.push(new Node(x, y))
+			this.nodes.push(new Node(x, y, this.nodes.length))
 		}
 
 		this.vao = gl.createVertexArray()
@@ -19,6 +19,8 @@ class Nodes {
 
 		this.ibo = gl.createBuffer()
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+
+		this.fortune_obj = new Fortune(this.nodes)
 	}
 
 	update_mesh() {
@@ -80,17 +82,12 @@ class Nodes {
 
 	fortune() {
 		const start_time = performance.now()
-		const {voronoi_lines} = fortune(this.nodes)
+		const res = this.fortune_obj.fortune()
 		const end_time = performance.now()
 
 		console.log(`Call to fortune took ${end_time - start_time} milliseconds`)
 
-		// TODO turn the edges returned by fortune into triangles
-
-		return {
-			voronoi_lines: voronoi_lines,
-			delaunay_triangles: [],
-		}
+		return res
 	}
 }
 

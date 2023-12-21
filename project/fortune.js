@@ -4,12 +4,16 @@ const events = {
 }
 
 class Fortune {
-	constructor() {
+	/** @constructor
+	  * @param {Node[]} nodes
+	  */
+	constructor(nodes) {
 		this.arc_count = 0
 		this.circle_count = 0
 
 		this.BOUNDING_WIDTH = 100
 
+		this.nodes = nodes
 		this.voronoi_lines = []
 
 		this.queue = new PriorityQueue()
@@ -36,7 +40,7 @@ class Fortune {
 		const dx = edge2.start.x - edge1.start.x
 		const dy = edge2.start.y - edge1.start.y
 
-		const det = ((edge2.direction.x * edge1.direction.y) - (edge2.direction.y * edge1.direction.x))
+		const det = (edge2.direction.x * edge1.direction.y) - (edge2.direction.y * edge1.direction.x)
 
 		if (det == 0) {
 			return null
@@ -62,8 +66,8 @@ class Fortune {
 	 * @param {BeachNode} arc - The arc to check for circle event
 	 */
 	search_for_circle_event(arc) {
-		let edge_left 	= this.beachline.get_first_parent_on_left(arc)
-		let edge_right  = this.beachline.get_first_parent_on_right(arc)
+		let edge_left = this.beachline.get_first_parent_on_left(arc)
+		let edge_right = this.beachline.get_first_parent_on_right(arc)
 
 		if (edge_left == null || edge_right == null ) {
 			return null
@@ -101,8 +105,17 @@ class Fortune {
 	 * @param {number} x2
 	 * @param {number} y2
 	 */
-	add_line(x1, y1, x2, y2) {
+	add_voronoi_line(x1, y1, x2, y2) {
 		this.voronoi_lines.push(new Line(x1, y1, x2, y2))
+	}
+
+	/** @function
+	 * @param {Node} start
+	 * @param {Node} end
+	 */
+	add_delaunay_line(start, end) {
+		start.site.incident.push(end.site)
+		end.site.incident.push(start.site)
 	}
 
 	add_remaining_lines(current_node) {
@@ -128,20 +141,17 @@ class Fortune {
 			max_x_coord = Math.min(current_node.start.x - this.BOUNDING_WIDTH, 0)
 		}
 
-		// this.add_line(current_node.start.x, current_node.start.y, max_x_coord, max_x_coord * current_node.slope + current_node.offset)
+		this.add_voronoi_line(current_node.start.x, current_node.start.y, max_x_coord, max_x_coord * current_node.slope + current_node.offset)
 
 		if (current_node.sides !== undefined) {
 			const [left_arc, right_arc] = current_node.sides
-			this.add_line(left_arc.site.x, left_arc.site.y, right_arc.site.x, right_arc.site.y)
+			this.add_delaunay_line(left_arc, right_arc)
 		}
 	}
 
-	/** @function
-	 * @param {Node[]} nodes
-	 * @returns {Edge[]}
-	 */
-	get_edges(nodes) {
-		for (const node of nodes) {
+	get_edges() {
+		for (const node of this.nodes) {
+			node.incident = []
 			this.queue.enqueue([node, events.site])
 		}
 
@@ -253,11 +263,11 @@ class Fortune {
 				new_edge.sides = [left_arc, right_arc]
 
 				// Create our "complete edges" (here it is lines for debugging)
-				// this.add_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
-				// this.add_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
+				this.add_voronoi_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
+				this.add_voronoi_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
 
-				this.add_line(right_arc.site.x, right_arc.site.y, current_arc.site.x, current_arc.site.y)
-				this.add_line(left_arc.site.x, left_arc.site.y, current_arc.site.x, current_arc.site.y)
+				this.add_delaunay_line(right_arc, current_arc)
+				this.add_delaunay_line(left_arc, current_arc)
 
 				new_edge.set_parent(higher_edge)
 				new_edge.set_left(higher_edge.left)
@@ -291,11 +301,78 @@ class Fortune {
 
 		// Traverse the tree to get the remaining "unfinished" edges
 		this.add_remaining_lines(this.beachline.root)
+	}
+
+	fortune() {
+		this.get_edges()
+
+		// create triangles
+
+		/** @type {Set<Triangle>} */
+		let triangles = new Set()
+
+		// BFS across the nodes
+
+		let q = [this.nodes[0]]
+		let visited = new Array(this.nodes.length).fill(false)
+		visited[0] = true
+
+		function angle_diff(a, b) {
+			a = (a + Math.PI * 2) % (Math.PI * 2)
+			b = (b + Math.PI * 2) % (Math.PI * 2)
+
+			return a - b
+		}
+
+		while (q.length > 0) {
+			const cur = q.pop(0)
+
+			// select incident to compare angles to
+
+			const baseline = cur.incident[0]
+			const baseline_angle = Math.atan2(baseline.y - cur.y, baseline.x - cur.x)
+
+			cur.incident.sort((a, b) => {
+				const a_angle = angle_diff(Math.atan2(a.y - cur.y, a.x - cur.x), baseline_angle)
+				const b_angle = angle_diff(Math.atan2(b.y - cur.y, b.x - cur.x), baseline_angle)
+
+				return a_angle - b_angle
+			})
+
+			for (let i = 0; i < cur.incident.length; i++) {
+				// TODO to prevent overlapping, there's probably a check here like is i in visited idk
+
+				const a = cur.incident[i]
+				const b = cur.incident[(i + 1) % cur.incident.length]
+				const side = a.x * -b.y + a.y * b.x
+
+				if (side < 0) {
+					continue
+				}
+
+				triangles.add(a.i * this.nodes.length * this.nodes.length + b.i * this.nodes.length + cur.i)
+
+				if (!visited[a.i]) {
+					q.push(a)
+					visited[a.i] = true
+				}
+
+				if (!visited[b.i]) {
+					q.push(b)
+					visited[b.i] = true
+				}
+			}
+		}
+
+		const unstupidified = Array.from(triangles).map(x => new Triangle(
+			this.nodes[Math.floor(x / this.nodes.length / this.nodes.length)],
+			this.nodes[Math.floor(x / this.nodes.length) % this.nodes.length],
+			this.nodes[x % this.nodes.length]
+		))
 
 		return {
 			voronoi_lines: this.voronoi_lines,
-			edges: [],
-			delaunay_triangles: [],
+			delaunay_triangles: unstupidified,
 		}
 	}
 }

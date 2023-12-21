@@ -32,12 +32,12 @@ for (let i = 0; i < 10000; i++) {
 
 const nodes = new Nodes(random_nodes)
 */
-const fortune = new Fortune()
+
 const nodes = new Nodes(nodeData)
 nodes.update_mesh()
 
 const node_shader = new Shader("node")
-const {voronoi_lines: voronoi_lines_raw, delaunay_triangles} = fortune.get_edges(nodes.nodes)
+const {voronoi_lines: voronoi_lines_raw, delaunay_triangles} = nodes.fortune()
 
 // voronoi lines
 
