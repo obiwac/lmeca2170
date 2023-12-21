@@ -14,7 +14,6 @@ class Fortune {
 
 		this.queue = new PriorityQueue()
 		this.beachline = new BeachTree()
-
 	}
 
 	/** @type: Line[] */
@@ -106,17 +105,17 @@ class Fortune {
 		this.voronoi_lines.push(new Line(x1, y1, x2, y2))
 	}
 
-	add_remaining_line(current_node) {
+	add_remaining_lines(current_node) {
 		if (current_node.is_leaf) {
 			return
 		}
 
 		if (current_node.left != null) {
-			this.add_remaining_line(current_node.left)
+			this.add_remaining_lines(current_node.left)
 		}
 
 		if (current_node.right != null) {
-			this.add_remaining_line(current_node.right)
+			this.add_remaining_lines(current_node.right)
 		}
 
 		let max_x_coord = null
@@ -129,7 +128,12 @@ class Fortune {
 			max_x_coord = Math.min(current_node.start.x - this.BOUNDING_WIDTH, 0)
 		}
 
-		this.add_line(current_node.start.x, current_node.start.y, max_x_coord, max_x_coord * current_node.slope + current_node.offset)
+		// this.add_line(current_node.start.x, current_node.start.y, max_x_coord, max_x_coord * current_node.slope + current_node.offset)
+
+		if (current_node.sides !== undefined) {
+			const [left_arc, right_arc] = current_node.sides
+			this.add_line(left_arc.site.x, left_arc.site.y, right_arc.site.x, right_arc.site.y)
+		}
 	}
 
 	/** @function
@@ -162,9 +166,9 @@ class Fortune {
 					above_arc.circle_event.is_valid = false
 				}
 
-				const left_arc 		= new BeachNode(above_arc.site, this.arc_count)
-				const middle_arc 	= new BeachNode(current_event[0], this.arc_count)
-				const right_arc 	= new BeachNode(above_arc.site, this.arc_count)
+				const left_arc = new BeachNode(above_arc.site, this.arc_count)
+				const middle_arc = new BeachNode(current_event[0], this.arc_count)
+				const right_arc = new BeachNode(above_arc.site, this.arc_count)
 
 				// same id because they are the same parabola
 
@@ -229,6 +233,7 @@ class Fortune {
 
 				while (current_node.parent != null) {
 					current_node = current_node.parent
+
 					if (current_node.compare(left_edge)) {
 						higher_edge = left_edge
 					}
@@ -245,10 +250,14 @@ class Fortune {
 				// Add a new breakpoint at intersection point which will be the bisector of the two arcs
 				let new_edge = new BreakPoint(current_event[0].point, left_arc.site, right_arc.site)
 				new_edge.set_id(left_arc.id, right_arc.id)
+				new_edge.sides = [left_arc, right_arc]
 
 				// Create our "complete edges" (here it is lines for debugging)
-				this.add_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
-				this.add_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
+				// this.add_line(current_event[0].point.x, current_event[0].point.y, left_edge.start.x, left_edge.start.y)
+				// this.add_line(right_edge.start.x, right_edge.start.y, current_event[0].point.x, current_event[0].point.y)
+
+				this.add_line(right_arc.site.x, right_arc.site.y, current_arc.site.x, current_arc.site.y)
+				this.add_line(left_arc.site.x, left_arc.site.y, current_arc.site.x, current_arc.site.y)
 
 				new_edge.set_parent(higher_edge)
 				new_edge.set_left(higher_edge.left)
@@ -281,7 +290,7 @@ class Fortune {
 		}
 
 		// Traverse the tree to get the remaining "unfinished" edges
-		this.add_remaining_line(this.beachline.root)
+		this.add_remaining_lines(this.beachline.root)
 
 		return {
 			voronoi_lines: this.voronoi_lines,
