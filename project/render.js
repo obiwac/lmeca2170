@@ -117,6 +117,8 @@ class Triangles {
 		let vertices = []
 		let indices = []
 
+		// TODO what I should really be doing is shifting the edges across their normals
+
 		function shifted_coord(main_node, other_node_1, other_node_2) {
 			const dx_1 = main_node.x - other_node_1.x
 			const dy_1 = main_node.y - other_node_1.y
