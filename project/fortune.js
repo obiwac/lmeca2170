@@ -1,17 +1,16 @@
-// TODO DON'T MAKE THIS GLOBAL STATE
 const events = {
 	"site": 0,
 	"circle": 1,
 }
 
-class Fortune{
+class Fortune {
 	constructor() {
 		this.arc_count = 0
 		this.circle_count = 0
 
 		this.BOUNDING_WIDTH = 100
 
-		this.TODO_voronoi_lines = []
+		this.voronoi_lines = []
 
 		this.queue = new PriorityQueue()
 		this.beachline = new BeachTree()
@@ -28,7 +27,7 @@ class Fortune{
 		return a1 * x * x + b1 * x + c1
 	}
 
-	//* https://blog.ivank.net/fortunes-algorithm-and-implementation.html
+	// https://blog.ivank.net/fortunes-algorithm-and-implementation.html
 	/** @function
 	 * @param {BreakPoint} edge1 - The first edge
 	 * @param {BreakPoint} edge2 - The second edge
@@ -104,7 +103,7 @@ class Fortune{
 	 * @param {number} y2
 	 */
 	add_line(x1, y1, x2, y2) {
-		this.TODO_voronoi_lines.push(new Line(x1, y1, x2, y2))
+		this.voronoi_lines.push(new Line(x1, y1, x2, y2))
 	}
 
 	add_remaining_line(current_node) {
@@ -285,7 +284,7 @@ class Fortune{
 		this.add_remaining_line(this.beachline.root)
 
 		return {
-			voronoi_lines: this.TODO_voronoi_lines,
+			voronoi_lines: this.voronoi_lines,
 			edges: [],
 			delaunay_triangles: [],
 		}
