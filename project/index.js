@@ -42,6 +42,7 @@ const {voronoi_lines: voronoi_lines_raw, delaunay_triangles} = nodes.fortune()
 // voronoi lines
 
 const voronoi_lines = new Lines(voronoi_lines_raw)
+const voronoi_shader = new Shader("voronoi")
 voronoi_lines.update_mesh()
 
 // triangles
@@ -146,6 +147,9 @@ function render(now) {
 	nodes.draw()
 
 	// render voronoi lines
+
+	voronoi_shader.use()
+	voronoi_shader.mvp(mvp_mat)
 
 	voronoi_lines.draw()
 
