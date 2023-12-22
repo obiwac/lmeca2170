@@ -35,6 +35,11 @@ demo.start(pos => {
 	nodes.draw()
 })
 
+function update(node_data) {
+	nodes = new Nodes(demo.gl, node_data)
+	nodes.update_mesh()
+}
+
 document.getElementById("just-nodes-randomize").onclick = () => {
 	let random_nodes = []
 	const scale = 10
@@ -43,6 +48,17 @@ document.getElementById("just-nodes-randomize").onclick = () => {
 		random_nodes.push([scale * (Math.random() - .5), scale * (Math.random() - .5)])
 	}
 
-	nodes = new Nodes(demo.gl, random_nodes)
-	nodes.update_mesh()
+	update(random_nodes)
 }
+
+const upload = document.getElementById("just-nodes-file")
+
+upload.addEventListener("change", () => {
+	const reader = new FileReader()
+
+	reader.addEventListener("load", e => {
+		update(e.target.result.match(/\[([^[\]]*)\]/g).map(x => JSON.parse(x)))
+	})
+
+	reader.readAsText(upload.files[0])
+})
