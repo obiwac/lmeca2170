@@ -32,8 +32,6 @@ export class Nodes {
 	  */
 	add(x, y) {
 		this.nodes.push(new Node(x, y, this.nodes.length))
-		console.log(this.nodes.length)
-		this.update_mesh()
 	}
 
 	update_mesh() {
