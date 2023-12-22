@@ -342,7 +342,7 @@ export class Fortune {
 				const a_angle = angle_diff(Math.atan2(a.y - cur.y, a.x - cur.x), baseline_angle)
 				const b_angle = angle_diff(Math.atan2(b.y - cur.y, b.x - cur.x), baseline_angle)
 
-				return a_angle - b_angle
+				return b_angle - a_angle
 			})
 
 			for (let i = 0; i < cur.incident.length; i++) {
@@ -354,7 +354,7 @@ export class Fortune {
 
 				const side = a_angle - b_angle
 
-				if (side > 0 && side < Math.PI) {
+				if (side > Math.PI || (side < 0 && side > -Math.PI)) {
 					continue
 				}
 
