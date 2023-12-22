@@ -3,17 +3,10 @@ import { Nodes, Lines } from "./render.js"
 import { Shader } from "./shader.js"
 import { Mat } from "./matrix.js"
 
-const demo = new Demo("voronoi-canvas")
-
 let nodes, voronoi_lines
 
-function update(node_data) {
-	// nodes
-
-	nodes = new Nodes(demo.gl, node_data)
+function update() {
 	nodes.update_mesh()
-
-	// voronoi lines
 
 	const {voronoi_lines: voronoi_lines_raw, time_took} = nodes.fortune()
 	document.getElementById("voronoi-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
@@ -22,7 +15,17 @@ function update(node_data) {
 	voronoi_lines.update_mesh()
 }
 
-update(nodeData)
+function update_all(node_data) {
+	nodes = new Nodes(demo.gl, node_data)
+	update()
+}
+
+const demo = new Demo("voronoi-canvas", (x, y) => {
+	nodes.add(x, y)
+	update()
+})
+
+update_all(nodeData)
 
 const node_shader = new Shader(demo.gl, "node")
 const voronoi_shader = new Shader(demo.gl, "voronoi")
@@ -68,7 +71,7 @@ document.getElementById("voronoi-randomize").onclick = () => {
 		random_nodes.push([scale * (Math.random() - .5), scale * (Math.random() - .5)])
 	}
 
-	update(random_nodes)
+	update_all(random_nodes)
 }
 
 const upload = document.getElementById("voronoi-file")
@@ -77,7 +80,7 @@ upload.addEventListener("change", () => {
 	const reader = new FileReader()
 
 	reader.addEventListener("load", e => {
-		update(e.target.result.match(/\[([^[\]]*)\]/g).map(x => JSON.parse(x)))
+		update_all(e.target.result.match(/\[([^[\]]*)\]/g).map(x => JSON.parse(x)))
 	})
 
 	reader.readAsText(upload.files[0])
