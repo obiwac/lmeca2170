@@ -143,9 +143,16 @@
 				The final step of the process is to find the dual of the Voronoi diagram, which is our Delaunay triangulation. Essentially, we connect the sites of two parabolas when they meet at a <strong>circle event</strong>.
 			</p>
 
-			<p>
-				Click <a>here</a> to upload your own node file, or click <a id="final-randomize">here</a> to generate a random set of nodes.
-			</p>
+			<form enctype="multipart/form-data">
+				<input type="file" id="final-file" hidden />
+				<p>
+					Click
+					<label class="link" for="final-file">here</label>
+					to upload your own node file, or click
+					<a id="final-randomize">here</a>
+					to generate a random set of nodes.
+				</p>
+			</form>
 
 			<div class="canvas-container">
 				<canvas id="final-canvas" width="800" height="480"></canvas>

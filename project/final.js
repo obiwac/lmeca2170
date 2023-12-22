@@ -5,26 +5,33 @@ import { Mat } from "./matrix.js"
 
 const demo = new Demo("final-canvas")
 
-// nodes
+let nodes, voronoi_lines, triangles
 
-let nodes = new Nodes(demo.gl, nodeData)
-nodes.update_mesh()
+function update(node_data) {
+	// nodes
+
+	nodes = new Nodes(demo.gl, node_data)
+	nodes.update_mesh()
+
+	const {voronoi_lines: voronoi_lines_raw, delaunay_triangles, time_took} = nodes.fortune()
+	document.getElementById("final-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
+
+	// voronoi lines
+
+	voronoi_lines = new Lines(demo.gl, voronoi_lines_raw)
+	voronoi_lines.update_mesh()
+
+	// triangles
+
+	triangles = new Triangles(demo.gl, delaunay_triangles)
+	triangles.update_mesh()
+}
+
+update(nodeData)
 
 const node_shader = new Shader(demo.gl, "node")
-const {voronoi_lines: voronoi_lines_raw, delaunay_triangles, time_took} = nodes.fortune()
-document.getElementById("final-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
-
-// voronoi lines
-
-let voronoi_lines = new Lines(demo.gl, voronoi_lines_raw)
 const voronoi_shader = new Shader(demo.gl, "voronoi")
-voronoi_lines.update_mesh()
-
-// triangles
-
-let triangles = new Triangles(demo.gl, delaunay_triangles)
 const triangle_shader = new Shader(demo.gl, "tri")
-triangles.update_mesh()
 
 demo.start(pos => {
 	// projection stuff
@@ -90,3 +97,15 @@ document.getElementById("final-randomize").onclick = () => {
 	triangles = new Triangles(demo.gl, delaunay_triangles)
 	triangles.update_mesh()
 }
+
+const upload = document.getElementById("final-file")
+
+upload.addEventListener("change", () => {
+	const reader = new FileReader()
+
+	reader.addEventListener("load", e => {
+		update(e.target.result.match(/\[([^[\]]*)\]/g).map(x => JSON.parse(x)))
+	})
+
+	reader.readAsText(upload.files[0])
+})
