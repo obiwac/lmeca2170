@@ -308,7 +308,9 @@ export class Fortune {
 	}
 
 	fortune() {
+		const start_time = performance.now()
 		this.get_edges()
+		const end_time = performance.now()
 
 		// create triangles
 
@@ -380,6 +382,7 @@ export class Fortune {
 		return {
 			voronoi_lines: this.voronoi_lines,
 			delaunay_triangles: unstupidified,
+			time_took: end_time - start_time,
 		}
 	}
 }
