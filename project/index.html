@@ -121,8 +121,13 @@
 			<h2>Voronoi diagram</h2>
 
 			<p>
-				The next step is to create the Voronoi diagram of the nodes. This is done by creating a <strong>beach line</strong> and <strong>sweeping</strong> it across the nodes.
-				When we encounter a <strong>circle event</strong> or a <strong>site event</strong>, we add line segments to our set of Voronoi line segments, and we update the beach line accordingly.
+				The next step is to create the Voronoi diagram of the nodes. This is a mathematical concept that divides a space into regions based on the proximity to a set of points. </br>
+				</br>
+				This is done by using Fortune's algorithm. It create a <strong>beach line</strong> and <strong>sweeping</strong> it across the nodes.
+
+				When the sweepline encounter a <strong>site event</strong> (a node), it adds a <strong>parabola</strong> to the beach line. Then it search for <strong>circle event</strong> which is when there is a point where 3 sites are equidistant. </br>
+				</br>
+				When we encounter a <strong>circle event</strong>, we add line segments to our set of Voronoi line segments, and we update the beach line accordingly.
 			</p>
 
 			<form enctype="multipart/form-data">
@@ -144,7 +149,7 @@
 			<h2>Delaunay triangulation</h2>
 
 			<p>
-				The final step of the process is to find the dual of the Voronoi diagram, which is our Delaunay triangulation. Essentially, we connect the sites of two parabolas when they meet at a <strong>circle event</strong>.
+				The final step of the process is to find the dual of the Voronoi diagram, which is our Delaunay triangulation. Essentially, we connect each <strong>voronoi cell</strong> to their neibouring cells.
 			</p>
 
 			<form enctype="multipart/form-data">
@@ -185,7 +190,7 @@
 
 			<p>
 				As you can see, the time complexity indeed looks like <code>O(n*log(n))</code>!
-				The raw data is very spiky (average of 3 runs), and after profiling, we realized that a lot of time was being spent by the minor GC after each run. so for <code>n</code> between about 1000 and 6000, there's first a run which is relatively quick, and then a run which stalls a lot waiting for garbage collection.
+				The raw data is very spiky (average of 3 runs), and after profiling, we realized that a lot of time was being spent by the minor GC (garbage collector) after each run. so for <code>n</code> between about 1000 and 6000, there's first a run which is relatively quick, and then a run which stalls a lot waiting for garbage collection.
 			</p>
 
 			<p>
