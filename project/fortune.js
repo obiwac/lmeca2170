@@ -309,7 +309,28 @@ export class Fortune {
 
 	fortune() {
 		const start_time = performance.now()
-		this.get_edges()
+
+		if (0) { // XXX debugging
+			const old = this.nodes
+			let s = "["
+
+			for (let i = 10; i < 10000; i += 500) {
+				const start_time = performance.now()
+				this.nodes = old.slice(0, i)
+				this.voronoi_lines = []
+				this.get_edges()
+				const end_time = performance.now()
+				s += `${end_time - start_time},`
+				console.log(i, end_time - start_time)
+			}
+
+			console.log(s)
+		}
+
+		else {
+			this.get_edges()
+		}
+
 		const end_time = performance.now()
 
 		// create triangles
