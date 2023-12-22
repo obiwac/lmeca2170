@@ -3,7 +3,10 @@ import { Nodes } from "./render.js"
 import { Shader } from "./shader.js"
 import { Mat } from "./matrix.js"
 
-const demo = new Demo("just-nodes-canvas")
+const demo = new Demo("just-nodes-canvas", (x, y) => {
+	nodes.add(x, y)
+	nodes.update_mesh()
+})
 
 let nodes
 

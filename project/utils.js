@@ -22,8 +22,9 @@ export function anim_vec(x, target, multiplier) {
 export class Demo {
 	/** @constructor
 	  * @param {string} id
+	  * @param {function} add
 	  */
-	constructor(id) {
+	constructor(id, add) {
 		// initialize WebGL context
 
 		this.canvas = document.getElementById(id)
@@ -43,15 +44,52 @@ export class Demo {
 
 		// camera controls
 
-		this.pos = [-.5, -.5, 0]
-		this.target_pos = [-.5, -.5, -1]
+		this.pos = [0, 0, 0]
+		this.target_pos = [0, 0, -1]
+
+		const find_world_pos = e => {
+			const rect = this.canvas.getBoundingClientRect()
+
+			const cx = rect.left + this.canvas.clientWidth / 2
+			const cy = rect.top + this.canvas.clientHeight / 2
+
+			const mx = (e.clientX - cx) / this.canvas.clientWidth
+			const my = (e.clientY - cy) / this.canvas.clientHeight
+
+			const factor = 1 / Math.tan(TAU / 12) * 1.1 // XXX idk why it's 10% more
+
+			const x = -mx * factor * this.pos[2] - this.pos[0]
+			const y = my * this.y_res / this.x_res * factor * this.pos[2] - this.pos[1]
+
+			return [x, y]
+		}
+
+		this.canvas.addEventListener("click", e => {
+			const shift = e.getModifierState("Shift")
+			e.preventDefault()
+
+			if (e.button === 0) {
+				if (shift) {
+					const [x, y] = find_world_pos(e)
+					add(x, y)
+				}
+			}
+		})
 
 		this.canvas.addEventListener("mousemove", e => {
+			const shift = e.getModifierState("Shift")
 			e.preventDefault()
 
 			if (e.buttons & 0b1) {
-				this.target_pos[0] += e.movementX / 400 * -this.target_pos[2]
-				this.target_pos[1] -= e.movementY / 400 * -this.target_pos[2]
+				if (shift) {
+					const [x, y] = find_world_pos(e)
+					console.log(x, y)
+				}
+
+				else {
+					this.target_pos[0] += e.movementX / 400 * -this.target_pos[2]
+					this.target_pos[1] -= e.movementY / 400 * -this.target_pos[2]
+				}
 			}
 		})
 
