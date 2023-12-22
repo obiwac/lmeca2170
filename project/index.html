@@ -71,8 +71,10 @@
 			precision mediump float;
 			layout(location = 0) in vec2 node;
 			uniform mat4 u_mvp;
+			out vec2 pos;
 
 			void main(void) {
+				pos = node;
 				gl_Position = u_mvp * vec4(node, 0.0, 1.0);
 			}
 		</script>
@@ -80,6 +82,7 @@
 		<script id="tri-frag" type="x-shader/x-fragment">#version 300 es
 			precision mediump float;
 			out vec4 out_colour;
+			in vec2 pos;
 
 			void main(void) {
 				out_colour = vec4(1.0, 0.5, 1.0, 0.5);
@@ -100,6 +103,21 @@
 				Throughout every demo, you can click and drag to move the camera around and scroll in and out to zoom.
 				You can also shift+left click to add new nodes.
 			</p>
+
+			<p>
+				Nodes are represented by white circles, the Voronoi diagram's segments are represented by green lines, and triangles are coloured pink with black edges.
+				We used WebGL to render our visualizations, as it allows us more flexibility in shading and means we could also make camera controls feel a lot smoother.
+			</p>
+
+			<p>
+				⚠️ <strong>Warning:</strong> We decided to use ES6 modules for this project to ease development. We did not realize this until just before submitting as we tested using a development server, but accessing ES6 modules is a CORS violation, so it won't work with the <code>file://</code> protocol. You must thus run your own server. This is pretty easy to do; in the same directory as <code>index.html</code>, run:
+			</p>
+
+			<code>
+				python3 -m http.server -p 3000
+			</code>
+
+			<p>Then, you can navigate to <a href="http://localhost:3000">http://localhost:3000</a> to see the site.</p>
 
 			<h2>The nodes</h2>
 
