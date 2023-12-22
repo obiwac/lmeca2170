@@ -5,10 +5,15 @@ import { Mat } from "./matrix.js"
 
 const demo = new Demo("just-nodes-canvas")
 
-// nodes
+let nodes
 
-let nodes = new Nodes(demo.gl, nodeData)
-nodes.update_mesh()
+function update(node_data) {
+	nodes = new Nodes(demo.gl, node_data)
+	nodes.update_mesh()
+}
+
+update(nodeData)
+
 const node_shader = new Shader(demo.gl, "node")
 
 demo.start(pos => {
@@ -34,11 +39,6 @@ demo.start(pos => {
 
 	nodes.draw()
 })
-
-function update(node_data) {
-	nodes = new Nodes(demo.gl, node_data)
-	nodes.update_mesh()
-}
 
 document.getElementById("just-nodes-randomize").onclick = () => {
 	let random_nodes = []
