@@ -20,6 +20,9 @@
 		<script type="module" src="just_nodes.js"></script>
 		<script type="module" src="voronoi.js"></script>
 
+		<script src="chart.min.js"></script>
+		<script src="chart.js" defer></script>
+
 		<!-- node shader -->
 
 		<script id="node-vert" type="x-shader/x-vertex">#version 300 es
@@ -171,6 +174,14 @@
 				Bowyer-Watson also runs in <code>O(n*log(n))</code>, but is <i>much</i> less efficient than Fortune's as it has a much larger constant factor.
 				<a href="https://www.diva-portal.org/smash/get/diva2:1333680/FULLTEXT02.pdf">Benchmarks</a> indeed show quite a stark difference between the two in favour of Fortune's.
 			</p>
+
+			<p>
+				Here is a benchmark we ran on our implementation of Fortune's algorithm, in function of the number of nodes (<code>n</code>:
+			</p>
+
+			<div class="canvas-container">
+				<canvas id="benchmark-canvas" width="800" height="480"></canvas>
+			</div>
 
 			<h2>Extra resources</h2>
 			<p>Here are some extra resources relating to Fortune's algorithm, which helped us a lot in developing this site 😃</p>
