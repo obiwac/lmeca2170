@@ -344,8 +344,6 @@ export class Fortune {
 			})
 
 			for (let i = 0; i < cur.incident.length; i++) {
-				// TODO to prevent overlapping, there's probably a check here like is i in visited idk
-
 				const a = cur.incident[i]
 				const b = cur.incident[(i + 1) % cur.incident.length]
 
@@ -358,7 +356,8 @@ export class Fortune {
 					continue
 				}
 
-				triangles.add(a.i * this.nodes.length * this.nodes.length + b.i * this.nodes.length + cur.i)
+				const sorted = [a.i, b.i, cur.i].sort()
+				triangles.add(sorted[0] * this.nodes.length * this.nodes.length + sorted[1] * this.nodes.length + sorted[2])
 
 				if (!visited[a.i]) {
 					q.push(a)
