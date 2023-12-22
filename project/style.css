@@ -73,6 +73,7 @@ a, .link {
 a:hover, .link:hover {
 	/* transitions for gradients annoyingly aren't supported in most browsers */
 	background: var(--text-colour);
+	cursor: pointer;
 }
 
 .container {
