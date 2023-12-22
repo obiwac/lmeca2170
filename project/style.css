@@ -61,7 +61,7 @@ code {
 	background-color: var(--code-background);
 }
 
-a {
+a, .link {
 	text-decoration: none;
 	background: var(--gradient);
 	background-clip: none;
@@ -70,7 +70,7 @@ a {
 	border-radius: 3px;
 }
 
-a:hover {
+a:hover, .link:hover {
 	/* transitions for gradients annoyingly aren't supported in most browsers */
 	background: var(--text-colour);
 }
