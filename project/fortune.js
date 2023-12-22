@@ -156,6 +156,7 @@ export class Fortune {
 	get_edges() {
 		for (const node of this.nodes) {
 			node.incident = []
+			node.y += Math.random() * 0.0001
 			this.queue.enqueue([node, events.site])
 		}
 
