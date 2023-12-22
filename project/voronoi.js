@@ -5,20 +5,27 @@ import { Mat } from "./matrix.js"
 
 const demo = new Demo("voronoi-canvas")
 
-// nodes
+let nodes, voronoi_lines
 
-let nodes = new Nodes(demo.gl, nodeData)
-nodes.update_mesh()
+function update(node_data) {
+	// nodes
+
+	nodes = new Nodes(demo.gl, node_data)
+	nodes.update_mesh()
+
+	// voronoi lines
+
+	const {voronoi_lines: voronoi_lines_raw, time_took} = nodes.fortune()
+	document.getElementById("voronoi-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
+
+	voronoi_lines = new Lines(demo.gl, voronoi_lines_raw)
+	voronoi_lines.update_mesh()
+}
+
+update(nodeData)
 
 const node_shader = new Shader(demo.gl, "node")
-const {voronoi_lines: voronoi_lines_raw, time_took} = nodes.fortune()
-document.getElementById("voronoi-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
-
-// voronoi lines
-
-let voronoi_lines = new Lines(demo.gl, voronoi_lines_raw)
 const voronoi_shader = new Shader(demo.gl, "voronoi")
-voronoi_lines.update_mesh()
 
 demo.start(pos => {
 	// projection stuff
@@ -54,8 +61,6 @@ demo.start(pos => {
 })
 
 document.getElementById("voronoi-randomize").onclick = () => {
-	// nodes
-
 	let random_nodes = []
 	const scale = 20
 
@@ -63,14 +68,17 @@ document.getElementById("voronoi-randomize").onclick = () => {
 		random_nodes.push([scale * (Math.random() - .5), scale * (Math.random() - .5)])
 	}
 
-	nodes = new Nodes(demo.gl, random_nodes)
-	nodes.update_mesh()
-
-	// voronoi lines
-
-	const {voronoi_lines: voronoi_lines_raw, time_took} = nodes.fortune()
-	document.getElementById("voronoi-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
-
-	voronoi_lines = new Lines(demo.gl, voronoi_lines_raw)
-	voronoi_lines.update_mesh()
+	update(random_nodes)
 }
+
+const upload = document.getElementById("voronoi-file")
+
+upload.addEventListener("change", () => {
+	const reader = new FileReader()
+
+	reader.addEventListener("load", e => {
+		update(e.target.result.match(/\[([^[\]]*)\]/g).map(x => JSON.parse(x)))
+	})
+
+	reader.readAsText(upload.files[0])
+})

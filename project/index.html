@@ -121,9 +121,16 @@
 				When we encounter a <strong>circle event</strong> or a <strong>site event</strong>, we add line segments to our set of Voronoi line segments, and we update the beach line accordingly.
 			</p>
 
-			<p>
-				Again, you can upload your own node files, or click <a id="voronoi-randomize">here</a> to generate a random set of nodes.
-			</p>
+			<form enctype="multipart/form-data">
+				<input type="file" id="voronoi-file" hidden />
+				<p>
+					Again, you can
+					<label class="link" for="voronoi-file">upload your own node files</label>,
+					or click
+					<a id="voronoi-randomize">here</a>
+					to generate a random set of nodes.
+				</p>
+			</form>
 
 			<div class="canvas-container">
 				<canvas id="voronoi-canvas" width="800" height="480"></canvas>
