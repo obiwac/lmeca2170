@@ -9,13 +9,15 @@
 		<script src="nodes_coarse.txt"></script> <!-- XXX no clue why this was given to us with a .txt extension -->
 		<script type="module" src="matrix.js"></script>
 		<script type="module" src="primitives.js"></script>
-		<script type="module" src="index.js" defer></script> <!-- defer to execute after the window has been loaded -->
 		<script type="module" src="beach_tree.js"></script>
 		<script type="module" src="fortune.js"></script>
 		<script type="module" src="priority_queue.js"></script>
 		<script type="module" src="render.js"></script>
 		<script type="module" src="utils.js"></script>
 		<script type="module" src="shader.js"></script>
+
+		<script type="module" src="just_nodes.js"></script>
+		<script type="module" src="final.js"></script>
 
 		<!-- node shader -->
 
@@ -101,12 +103,14 @@
 			<h2>The nodes</h2>
 
 			<p>
-				We start off by just showing the nodes themselves. You can upload your own nodes file, or press the randomize button to generate a random set of nodes.
+				We start off by just showing the nodes themselves. You can upload your own nodes file, or press the randomize button to generate a random set of 10,000 nodes:
 			</p>
 
 			<div class="canvas-container">
 				<canvas id="just-nodes-canvas" width="800" height="480"></canvas>
 			</div>
+
+			<button id="just-nodes-randomize">Randomize</button>
 
 			<h2>What is a Voronoi diagram?</h2>
 			<h2>What is the relation between Delaunay and Voronoi?</h2>
