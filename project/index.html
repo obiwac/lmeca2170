@@ -183,6 +183,15 @@
 				<canvas id="benchmark-canvas" width="800" height="480"></canvas>
 			</div>
 
+			<p>
+				As you can see, the time complexity indeed looks like <code>O(n*log(n))</code>!
+				The raw data is very spiky (average of 3 runs), and after profiling, we realized that a lot of time was being spent by the minor GC after each run. so for <code>n</code> between about 1000 and 6000, there's first a run which is relatively quick, and then a run which stalls a lot waiting for garbage collection.
+			</p>
+
+			<p>
+				We could improve the performance of this a lot by avoiding operations which create new objects (e.g. <code>.toString()</code>), but because this is difficult to do in JavaScript and it's a bit out of scope, we decided to leave this as an exercise to the reader 😉
+			</p>
+
 			<h2>Extra resources</h2>
 			<p>Here are some extra resources relating to Fortune's algorithm, which helped us a lot in developing this site 😃</p>
 
