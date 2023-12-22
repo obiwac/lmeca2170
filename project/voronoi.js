@@ -12,7 +12,7 @@ nodes.update_mesh()
 
 const node_shader = new Shader(demo.gl, "node")
 const {voronoi_lines: voronoi_lines_raw, time_took} = nodes.fortune()
-document.getElementById("final-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
+document.getElementById("voronoi-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
 
 // voronoi lines
 
