@@ -24,8 +24,16 @@ export class Nodes {
 
 		this.ibo = gl.createBuffer()
 		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+	}
 
-		this.fortune_obj = new Fortune(this.nodes)
+	/** @function
+	  * @param {number} x
+	  * @param {number} y
+	  */
+	add(x, y) {
+		this.nodes.push(new Node(x, y, this.nodes.length))
+		console.log(this.nodes.length)
+		this.update_mesh()
 	}
 
 	update_mesh() {
@@ -86,6 +94,7 @@ export class Nodes {
 	}
 
 	fortune() {
+		this.fortune_obj = new Fortune(this.nodes)
 		return this.fortune_obj.fortune()
 	}
 }
