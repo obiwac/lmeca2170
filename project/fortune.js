@@ -348,9 +348,13 @@ export class Fortune {
 
 				const a = cur.incident[i]
 				const b = cur.incident[(i + 1) % cur.incident.length]
-				const side = a.x * -b.y + a.y * b.x
 
-				if (side < 0) {
+				const a_angle = angle_diff(Math.atan2(a.y - cur.y, a.x - cur.x), baseline_angle)
+				const b_angle = angle_diff(Math.atan2(b.y - cur.y, b.x - cur.x), baseline_angle)
+
+				const side = a_angle - b_angle
+
+				if (side > 0 && side < Math.PI) {
 					continue
 				}
 
