@@ -7,17 +7,6 @@ const demo = new Demo("just-nodes-canvas")
 
 // nodes
 
-/*
-let random_nodes = []
-const scale = 10
-
-for (let i = 0; i < 10000; i++) {
-	random_nodes.push([scale * (Math.random() - .5), scale * (Math.random() - .5)])
-}
-
-const nodes = new Nodes(random_nodes)
-*/
-
 let nodes = new Nodes(demo.gl, nodeData)
 nodes.update_mesh()
 const node_shader = new Shader(demo.gl, "node")

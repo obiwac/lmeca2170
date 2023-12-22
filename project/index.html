@@ -16,8 +16,9 @@
 		<script type="module" src="utils.js"></script>
 		<script type="module" src="shader.js"></script>
 
-		<script type="module" src="just_nodes.js"></script>
 		<script type="module" src="final.js"></script>
+		<script type="module" src="just_nodes.js"></script>
+		<script type="module" src="voronoi.js"></script>
 
 		<!-- node shader -->
 
@@ -98,17 +99,33 @@
 			</div>
 
 			<p>
-				Throughout every demo, you can click and drag to move the camera around and scroll in and out to zoom in and out.
+				Throughout every demo, you can click and drag to move the camera around and scroll in and out to zoom.
 			</p>
 
 			<h2>The nodes</h2>
 
 			<p>
-				We start off by just showing the nodes themselves. You can upload your own nodes file, or click <a id="just-nodes-randomize">here</a> to generate a random set of 10,000 nodes:
+				We start off by just showing the nodes themselves. You can upload your own nodes file, or click <a id="just-nodes-randomize">here</a> to generate a random set of 5000 nodes:
 			</p>
 
 			<div class="canvas-container">
 				<canvas id="just-nodes-canvas" width="800" height="480"></canvas>
+			</div>
+
+			<h2>Voronoi diagram</h2>
+
+			<p>
+				The next step is to create the Voronoi diagram of the nodes. This is done by creating a <strong>beach line</strong> and <strong>sweeping</strong> it across the nodes.
+				When we encounter a circle event or a site event, we add line segments to our set of Voronoi line segments, and we update the beach line accordingly.
+			</p>
+
+			<p>
+				Again, you can upload your own node files, or click <a id="voronoi-randomize">here</a> to generate a random set of nodes:
+			</p>
+
+			<div class="canvas-container">
+				<canvas id="voronoi-canvas" width="800" height="480"></canvas>
+				<p id="voronoi-time">Took - ms for - nodes</p>
 			</div>
 
 			<h2>What is a Voronoi diagram?</h2>
