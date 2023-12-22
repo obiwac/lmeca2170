@@ -1,5 +1,7 @@
-class Shader {
-	constructor(id) {
+export class Shader {
+	constructor(gl, id) {
+		this.gl = gl
+
 		const vert_id = `${id}-vert`
 		const frag_id = `${id}-frag`
 
@@ -41,13 +43,13 @@ class Shader {
 	}
 
 	use() {
-		gl.useProgram(this.program)
+		this.gl.useProgram(this.program)
 	}
 
 	/** @function
 	  * @param {Mat} mat
 	  */
 	mvp(mat) {
-		gl.uniformMatrix4fv(this.mvp_uniform, false, mat.data.flat())
+		this.gl.uniformMatrix4fv(this.mvp_uniform, false, mat.data.flat())
 	}
 }

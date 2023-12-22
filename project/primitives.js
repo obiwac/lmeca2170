@@ -1,4 +1,4 @@
-class Node {
+export class Node {
 	/** @function
 	  * @param {number} x
 	  * @param {number} y
@@ -26,7 +26,7 @@ class Node {
 
 // TODO make this a HalfEdge thingy
 
-class Edge {
+export class Edge {
 	/** @function
 	  * @param {Node} start
 	  * @param {Node} end
@@ -37,7 +37,7 @@ class Edge {
 	}
 }
 
-class Triangle {
+export class Triangle {
 	/** @function
 	  * @param {Node} a
 	  * @param {Node} b
@@ -50,7 +50,7 @@ class Triangle {
 	}
 }
 
-class Line {
+export class Line {
 	/** @function
 	  * @param {number} x1
 	  * @param {number} y1

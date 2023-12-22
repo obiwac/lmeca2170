@@ -1,4 +1,4 @@
-class PriorityQueue {
+export class PriorityQueue {
 	constructor() {
 		this.lazy_tree = []
 		this.length = 0;

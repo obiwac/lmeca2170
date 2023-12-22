@@ -1,9 +1,11 @@
+import { Node } from "./primitives.js"
+
 // AVL Beach Tree implementation
 // internal nodes are BreakPoint's and leaves are Arc's
 // see: https://www.programiz.com/dsa/avl-tree
 // see: https://blog.ivank.net/fortunes-algorithm-and-implementation.html
 
-class CircleEvent {
+export class CircleEvent {
 	constructor(site, arc, y, radius, id) {
 		this.point = site
 		this.y = y
@@ -26,7 +28,7 @@ class CircleEvent {
 	}
 }
 
-class BeachNode {
+export class BeachNode {
 	constructor(site, id) {
 		this.site = site
 
@@ -126,7 +128,7 @@ class BeachNode {
 	}
 }
 
-class BreakPoint extends BeachNode {
+export class BreakPoint extends BeachNode {
 	constructor(start, left_site, right_site) {
 		super(null, null)
 
@@ -142,7 +144,7 @@ class BreakPoint extends BeachNode {
 	}
 }
 
-class BeachTree {
+export class BeachTree {
 	constructor() {
 		this.root = null
 	}

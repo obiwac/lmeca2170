@@ -1,7 +1,12 @@
+import { Node, Triangle, Line } from "./primitives.js"
+import { FLOAT32_SIZE, TAU } from "./utils.js"
+import { Fortune } from "./fortune.js"
+
 // TODO find a better name for this
 
-class Nodes {
-	constructor(nodeData) {
+export class Nodes {
+	constructor(gl, nodeData) {
+		this.gl = gl
 		this.nodes = []
 
 		for (const [x, y] of nodeData) {
@@ -63,21 +68,21 @@ class Nodes {
 
 		// upload mesh data to GPU
 
-		gl.bindVertexArray(this.vao)
+		this.gl.bindVertexArray(this.vao)
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bufferData(gl.ARRAY_BUFFER, vbo_data, gl.STATIC_DRAW)
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo)
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, vbo_data, this.gl.STATIC_DRAW)
 
-		gl.enableVertexAttribArray(0)
-		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+		this.gl.enableVertexAttribArray(0)
+		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
 
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ibo_data, gl.STATIC_DRAW)
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, ibo_data, this.gl.STATIC_DRAW)
 	}
 
 	draw() {
-		gl.bindVertexArray(this.vao)
-		gl.drawElements(gl.TRIANGLES, this.indices_length, gl.UNSIGNED_INT, 0)
+		this.gl.bindVertexArray(this.vao)
+		this.gl.drawElements(this.gl.TRIANGLES, this.indices_length, this.gl.UNSIGNED_INT, 0)
 	}
 
 	fortune() {
@@ -91,11 +96,13 @@ class Nodes {
 	}
 }
 
-class Triangles {
-	/** @function
+export class Triangles {
+	/** @constructor
+	  * @param {WebGLRenderingContext | WebGL2RenderingContext} gl
 	  * @param {Triangle[]} triangles
 	  */
-	constructor(triangles) {
+	constructor(gl, triangles) {
+		this.gl = gl
 		this.triangles = triangles
 
 		this.vao = gl.createVertexArray()
@@ -160,29 +167,31 @@ class Triangles {
 
 		// upload mesh data to GPU
 
-		gl.bindVertexArray(this.vao)
+		this.gl.bindVertexArray(this.vao)
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bufferData(gl.ARRAY_BUFFER, vbo_data, gl.STATIC_DRAW)
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo)
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, vbo_data, this.gl.STATIC_DRAW)
 
-		gl.enableVertexAttribArray(0)
-		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+		this.gl.enableVertexAttribArray(0)
+		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
 
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ibo_data, gl.STATIC_DRAW)
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, ibo_data, this.gl.STATIC_DRAW)
 	}
 
 	draw() {
-		gl.bindVertexArray(this.vao)
-		gl.drawElements(gl.TRIANGLES, this.indices_length, gl.UNSIGNED_INT, 0)
+		this.gl.bindVertexArray(this.vao)
+		this.gl.drawElements(this.gl.TRIANGLES, this.indices_length, this.gl.UNSIGNED_INT, 0)
 	}
 }
 
-class Lines {
-	/** @function
+export class Lines {
+	/** @constructor
+	  * @param {WebGLRenderingContext | WebGL2RenderingContext} gl
 	  * @param {Line[]} lines
 	  */
-	constructor(lines) {
+	constructor(gl, lines) {
+		this.gl = gl
 		this.lines = lines
 
 		this.vao = gl.createVertexArray()
@@ -220,20 +229,20 @@ class Lines {
 
 		// upload mesh data to GPU
 
-		gl.bindVertexArray(this.vao)
+		this.gl.bindVertexArray(this.vao)
 
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo)
-		gl.bufferData(gl.ARRAY_BUFFER, vbo_data, gl.STATIC_DRAW)
+		this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vbo)
+		this.gl.bufferData(this.gl.ARRAY_BUFFER, vbo_data, this.gl.STATIC_DRAW)
 
-		gl.enableVertexAttribArray(0)
-		gl.vertexAttribPointer(0, 2, gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
+		this.gl.enableVertexAttribArray(0)
+		this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, FLOAT32_SIZE * 2, 0)
 
-		gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo)
-		gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ibo_data, gl.STATIC_DRAW)
+		this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.ibo)
+		this.gl.bufferData(this.gl.ELEMENT_ARRAY_BUFFER, ibo_data, this.gl.STATIC_DRAW)
 	}
 
 	draw() {
-		gl.bindVertexArray(this.vao)
-		gl.drawElements(gl.LINES, this.indices_length, gl.UNSIGNED_INT, 0)
+		this.gl.bindVertexArray(this.vao)
+		this.gl.drawElements(this.gl.LINES, this.indices_length, this.gl.UNSIGNED_INT, 0)
 	}
 }

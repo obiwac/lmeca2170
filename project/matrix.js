@@ -1,4 +1,4 @@
-class Mat {
+export class Mat {
 	// matrices are all 4x4, and are initialized as the identity matrix
 	// I won't comment on the code here all that much because it's pretty much just computations
 
