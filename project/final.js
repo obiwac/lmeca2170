@@ -3,7 +3,7 @@ import { Nodes, Lines, Triangles } from "./render.js"
 import { Shader } from "./shader.js"
 import { Mat } from "./matrix.js"
 
-const demo = new Demo("canvas")
+const demo = new Demo("final-canvas")
 
 // nodes
 
@@ -22,7 +22,8 @@ let nodes = new Nodes(demo.gl, nodeData)
 nodes.update_mesh()
 
 const node_shader = new Shader(demo.gl, "node")
-const {voronoi_lines: voronoi_lines_raw, delaunay_triangles} = nodes.fortune()
+const {voronoi_lines: voronoi_lines_raw, delaunay_triangles, time_took} = nodes.fortune()
+document.getElementById("final-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
 
 // voronoi lines
 

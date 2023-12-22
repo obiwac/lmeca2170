@@ -87,10 +87,11 @@ export class Nodes {
 
 	fortune() {
 		const start_time = performance.now()
-		const res = this.fortune_obj.fortune()
+		let res = this.fortune_obj.fortune()
 		const end_time = performance.now()
 
-		console.log(`Call to fortune took ${end_time - start_time} milliseconds`)
+		res.time_took = end_time - start_time
+		console.log(`Call to fortune took ${res.time_took} milliseconds`)
 
 		return res
 	}
