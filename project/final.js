@@ -7,17 +7,6 @@ const demo = new Demo("final-canvas")
 
 // nodes
 
-/*
-let random_nodes = []
-const scale = 10
-
-for (let i = 0; i < 10000; i++) {
-	random_nodes.push([scale * (Math.random() - .5), scale * (Math.random() - .5)])
-}
-
-const nodes = new Nodes(random_nodes)
-*/
-
 let nodes = new Nodes(demo.gl, nodeData)
 nodes.update_mesh()
 
@@ -74,3 +63,30 @@ demo.start(pos => {
 
 	voronoi_lines.draw()
 })
+
+document.getElementById("final-randomize").onclick = () => {
+	// nodes
+
+	let random_nodes = []
+	const scale = 20
+
+	for (let i = 0; i < 5000; i++) {
+		random_nodes.push([scale * (Math.random() - .5), scale * (Math.random() - .5)])
+	}
+
+	nodes = new Nodes(demo.gl, random_nodes)
+	nodes.update_mesh()
+
+	// voronoi lines
+
+	const {voronoi_lines: voronoi_lines_raw, delaunay_triangles, time_took} = nodes.fortune()
+	document.getElementById("final-time").innerText = `Took ${time_took} ms for ${nodes.nodes.length} nodes`
+
+	voronoi_lines = new Lines(demo.gl, voronoi_lines_raw)
+	voronoi_lines.update_mesh()
+
+	// triangles
+
+	triangles = new Triangles(demo.gl, delaunay_triangles)
+	triangles.update_mesh()
+}
