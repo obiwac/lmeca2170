@@ -90,13 +90,8 @@
 			<h2>Introduction</h2>
 			<p>
 				This article shows off <strong>Delaunay triangulation</strong> of an arbitrary set of nodes using Fortune's algorithm and the <strong>Voronoi diagram</strong>!
-				It also includes interactive demonstrations every step of the way - this is what the final result will look like:
+				It also includes interactive demonstrations every step of the way.
 			</p>
-
-			<div class="canvas-container">
-				<canvas id="final-canvas" width="800" height="480"></canvas>
-				<p id="final-time">Took - ms for - nodes</p>
-			</div>
 
 			<p>
 				Throughout every demo, you can click and drag to move the camera around and scroll in and out to zoom.
@@ -105,7 +100,7 @@
 			<h2>The nodes</h2>
 
 			<p>
-				We start off by just showing the nodes themselves. You can upload your own nodes file, or click <a id="just-nodes-randomize">here</a> to generate a random set of 5000 nodes:
+				We start off by just showing the nodes themselves. You can upload your own nodes file, or click <a id="just-nodes-randomize">here</a> to generate a random set of 5000 nodes.
 			</p>
 
 			<div class="canvas-container">
@@ -116,17 +111,36 @@
 
 			<p>
 				The next step is to create the Voronoi diagram of the nodes. This is done by creating a <strong>beach line</strong> and <strong>sweeping</strong> it across the nodes.
-				When we encounter a circle event or a site event, we add line segments to our set of Voronoi line segments, and we update the beach line accordingly.
+				When we encounter a <strong>circle event</strong> or a <strong>site event</strong>, we add line segments to our set of Voronoi line segments, and we update the beach line accordingly.
 			</p>
 
 			<p>
-				Again, you can upload your own node files, or click <a id="voronoi-randomize">here</a> to generate a random set of nodes:
+				Again, you can upload your own node files, or click <a id="voronoi-randomize">here</a> to generate a random set of nodes.
 			</p>
 
 			<div class="canvas-container">
 				<canvas id="voronoi-canvas" width="800" height="480"></canvas>
 				<p id="voronoi-time">Took - ms for - nodes</p>
 			</div>
+
+			<h2>Delaunay triangulation</h2>
+
+			<p>
+				The final step of the process is to find the dual of the Voronoi diagram, which is our Delaunay triangulation. Essentially, we connect the sites of two parabolas when they meet at a circle event.
+			</p>
+
+			<p>
+				Click <a>here</a> to upload your own node file, or click <a id="final-randomize">here</a> to generate a random set of nodes.
+			</p>
+
+			<div class="canvas-container">
+				<canvas id="final-canvas" width="800" height="480"></canvas>
+				<p id="final-time">Took - ms for - nodes</p>
+			</div>
+
+			<p>
+				That's all!
+			</p>
 
 			<h2>Extra resources</h2>
 			<p>Here are some extra resources relating to Fortune's algorithm, which helped us a lot in developing this site 😃</p>
