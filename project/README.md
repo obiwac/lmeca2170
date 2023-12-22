@@ -9,6 +9,6 @@ We highly recommand to enable hardware-acceleration in your browser to fully ben
 ## Getting Started
 You have to launch a web server in python to be able to view the webise.
 ```code
-	python3 -m http.server [Port]
+python3 -m http.server [Port]
 ```
 Then  can connect to the website at `http://0.0.0.0:Port/`
