@@ -84,6 +84,14 @@ a:hover {
 .canvas-container {
 	display: flex;
 	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+}
+
+.canvas-container > p {
+	color: var(--muted-colour);
+	font-style: italic;
+	font-size: 14px;
 }
 
 canvas {
